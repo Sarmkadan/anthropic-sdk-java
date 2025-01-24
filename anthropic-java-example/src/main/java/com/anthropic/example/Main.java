@@ -23,7 +23,7 @@ public final class Main {
             Message message = client.messages().create(createParamsBuilder.build());
 
             message.content().stream()
-                    .flatMap(contentBlock -> contentBlock.textBlock().stream())
+                    .flatMap(contentBlock -> contentBlock.text().stream())
                     .forEach(textBlock -> System.out.println(textBlock.text()));
 
             System.out.println("\n-----------------------------------\n");
@@ -40,8 +40,8 @@ public final class Main {
         try (StreamResponse<RawMessageStreamEvent> streamResponse =
                 client.messages().createStreaming(createParamsBuilder.build())) {
             streamResponse.stream()
-                    .flatMap(event -> event.rawContentBlockDeltaEvent().stream())
-                    .flatMap(deltaEvent -> deltaEvent.delta().textDelta().stream())
+                    .flatMap(event -> event.contentBlockDelta().stream())
+                    .flatMap(deltaEvent -> deltaEvent.delta().text().stream())
                     .forEach(textDelta -> System.out.print(textDelta.text()));
         } catch (Exception e) {
             System.out.println(e.getMessage());
