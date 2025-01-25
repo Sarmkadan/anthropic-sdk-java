@@ -2,23 +2,28 @@ package com.anthropic.example;
 
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
-import com.anthropic.core.http.StreamResponse;
-import com.anthropic.models.*;
+import com.anthropic.models.Message;
+import com.anthropic.models.MessageCreateParams;
+import com.anthropic.models.MessageParam;
+import com.anthropic.models.Model;
 
-public final class Main {
-    private Main() {}
+public final class MessagesConversationExample {
+    private MessagesConversationExample() {}
 
     public static void main(String[] args) {
+        // Configures using the `ANTHROPIC_API_KEY` environment variable
         AnthropicClient client = AnthropicOkHttpClient.fromEnv();
+
+        // Use a builder so that we can append more messages to it below.
+        // Each time we call .build()` we get an immutable object that's unaffected by future mutations of the builder.
         MessageCreateParams.Builder createParamsBuilder = MessageCreateParams.builder()
                 .model(Model.CLAUDE_3_5_SONNET_LATEST)
-                .maxTokens(1000)
+                .maxTokens(2048)
                 .addMessage(MessageParam.builder()
                         .role(MessageParam.Role.USER)
-                        .content(MessageParam.Content.ofString("Tell me a story about building the best SDK!"))
+                        .content("Tell me a story about building the best SDK!")
                         .build());
 
-        // Having a conversation in a loop
         for (int i = 0; i < 4; i++) {
             Message message = client.messages().create(createParamsBuilder.build());
 
@@ -29,22 +34,11 @@ public final class Main {
             System.out.println("\n-----------------------------------\n");
 
             createParamsBuilder
-                    .addMessage(message.toParam())
+                    .addMessage(message)
                     .addMessage(MessageParam.builder()
                             .role(MessageParam.Role.USER)
-                            .content(MessageParam.Content.ofString("But why???"))
+                            .content("But why?" + "?".repeat(i))
                             .build());
-        }
-
-        // Streaming example
-        try (StreamResponse<RawMessageStreamEvent> streamResponse =
-                client.messages().createStreaming(createParamsBuilder.build())) {
-            streamResponse.stream()
-                    .flatMap(event -> event.contentBlockDelta().stream())
-                    .flatMap(deltaEvent -> deltaEvent.delta().text().stream())
-                    .forEach(textDelta -> System.out.print(textDelta.text()));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 }
