@@ -46,6 +46,8 @@ This library requires Java 8 or later.
 
 ## Usage
 
+See the [`anthropic-java-example`](anthropic-java-example/src/main/java/com/anthropic/example) directory for complete and runnable examples.
+
 ### Configure the client
 
 Use `AnthropicOkHttpClient.builder()` to configure the client.
