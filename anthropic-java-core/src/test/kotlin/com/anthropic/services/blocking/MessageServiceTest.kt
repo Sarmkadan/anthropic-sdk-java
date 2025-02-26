@@ -20,13 +20,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 class MessageServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val messageService = client.messages()
+
         val message =
             messageService.create(
                 MessageCreateParams.builder()
@@ -66,12 +67,12 @@ class MessageServiceTest {
                     .topP(0.7)
                     .build()
             )
-        println(message)
+
         message.validate()
     }
 
     @Test
-    fun callCreateStreaming() {
+    fun createStreaming() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
@@ -79,7 +80,7 @@ class MessageServiceTest {
                 .build()
         val messageService = client.messages()
 
-        val messageStream =
+        val messageStreamResponse =
             messageService.createStreaming(
                 MessageCreateParams.builder()
                     .maxTokens(1024L)
@@ -119,22 +120,20 @@ class MessageServiceTest {
                     .build()
             )
 
-        messageStream.use {
-            messageStream.stream().forEach {
-                println(it)
-                it.validate()
-            }
+        messageStreamResponse.use {
+            messageStreamResponse.stream().forEach { message -> message.validate() }
         }
     }
 
     @Test
-    fun callCountTokens() {
+    fun countTokens() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val messageService = client.messages()
+
         val messageTokensCount =
             messageService.countTokens(
                 MessageCountTokensParams.builder()
@@ -166,7 +165,7 @@ class MessageServiceTest {
                     )
                     .build()
             )
-        println(messageTokensCount)
+
         messageTokensCount.validate()
     }
 }
