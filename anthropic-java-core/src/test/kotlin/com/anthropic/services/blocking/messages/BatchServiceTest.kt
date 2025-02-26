@@ -9,12 +9,14 @@ import com.anthropic.models.CitationCharLocationParam
 import com.anthropic.models.MessageBatchCancelParams
 import com.anthropic.models.MessageBatchCreateParams
 import com.anthropic.models.MessageBatchDeleteParams
+import com.anthropic.models.MessageBatchResultsParams
 import com.anthropic.models.MessageBatchRetrieveParams
 import com.anthropic.models.Metadata
 import com.anthropic.models.Model
 import com.anthropic.models.TextBlockParam
 import com.anthropic.models.ToolBash20250124
 import com.anthropic.models.ToolChoiceAuto
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -22,13 +24,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 class BatchServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.messages().batches()
+
         val messageBatch =
             batchService.create(
                 MessageBatchCreateParams.builder()
@@ -86,68 +89,95 @@ class BatchServiceTest {
                     )
                     .build()
             )
-        println(messageBatch)
+
         messageBatch.validate()
     }
 
     @Test
-    fun callRetrieve() {
+    fun retrieve() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.messages().batches()
+
         val messageBatch =
             batchService.retrieve(
                 MessageBatchRetrieveParams.builder().messageBatchId("message_batch_id").build()
             )
-        println(messageBatch)
+
         messageBatch.validate()
     }
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.messages().batches()
-        val listResponseMessageBatch = batchService.list()
-        println(listResponseMessageBatch)
-        listResponseMessageBatch.data().forEach { it.validate() }
+
+        val page = batchService.list()
+
+        page.response().validate()
     }
 
     @Test
-    fun callDelete() {
+    fun delete() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.messages().batches()
+
         val deletedMessageBatch =
             batchService.delete(
                 MessageBatchDeleteParams.builder().messageBatchId("message_batch_id").build()
             )
-        println(deletedMessageBatch)
+
         deletedMessageBatch.validate()
     }
 
     @Test
-    fun callCancel() {
+    fun cancel() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.messages().batches()
+
         val messageBatch =
             batchService.cancel(
                 MessageBatchCancelParams.builder().messageBatchId("message_batch_id").build()
             )
-        println(messageBatch)
+
         messageBatch.validate()
+    }
+
+    @Disabled("Prism doesn't support JSONL responses yet")
+    @Test
+    fun resultsStreaming() {
+        val client =
+            AnthropicOkHttpClient.builder()
+                .baseUrl(TestServerExtension.BASE_URL)
+                .apiKey("my-anthropic-api-key")
+                .build()
+        val batchService = client.messages().batches()
+
+        val messageBatchIndividualResponseStreamResponse =
+            batchService.resultsStreaming(
+                MessageBatchResultsParams.builder().messageBatchId("message_batch_id").build()
+            )
+
+        messageBatchIndividualResponseStreamResponse.use {
+            messageBatchIndividualResponseStreamResponse.stream().forEach {
+                messageBatchIndividualResponse ->
+                messageBatchIndividualResponse.validate()
+            }
+        }
     }
 }

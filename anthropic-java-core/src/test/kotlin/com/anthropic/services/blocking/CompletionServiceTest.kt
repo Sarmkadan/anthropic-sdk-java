@@ -14,13 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 class CompletionServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val completionService = client.completions()
+
         val completion =
             completionService.create(
                 CompletionCreateParams.builder()
@@ -36,12 +37,12 @@ class CompletionServiceTest {
                     .topP(0.7)
                     .build()
             )
-        println(completion)
+
         completion.validate()
     }
 
     @Test
-    fun callCreateStreaming() {
+    fun createStreaming() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
@@ -49,7 +50,7 @@ class CompletionServiceTest {
                 .build()
         val completionService = client.completions()
 
-        val completionStream =
+        val completionStreamResponse =
             completionService.createStreaming(
                 CompletionCreateParams.builder()
                     .maxTokensToSample(256L)
@@ -65,11 +66,8 @@ class CompletionServiceTest {
                     .build()
             )
 
-        completionStream.use {
-            completionStream.stream().forEach {
-                println(it)
-                it.validate()
-            }
+        completionStreamResponse.use {
+            completionStreamResponse.stream().forEach { completion -> completion.validate() }
         }
     }
 }

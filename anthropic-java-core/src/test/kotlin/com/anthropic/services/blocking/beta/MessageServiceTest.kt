@@ -21,13 +21,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 class MessageServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val messageService = client.beta().messages()
+
         val betaMessage =
             messageService.create(
                 BetaMessageCreateParams.builder()
@@ -73,12 +74,12 @@ class MessageServiceTest {
                     .topP(0.7)
                     .build()
             )
-        println(betaMessage)
+
         betaMessage.validate()
     }
 
     @Test
-    fun callCreateStreaming() {
+    fun createStreaming() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
@@ -86,7 +87,7 @@ class MessageServiceTest {
                 .build()
         val messageService = client.beta().messages()
 
-        val betaMessageStream =
+        val betaMessageStreamResponse =
             messageService.createStreaming(
                 BetaMessageCreateParams.builder()
                     .addBeta(AnthropicBeta.MESSAGE_BATCHES_2024_09_24)
@@ -132,22 +133,20 @@ class MessageServiceTest {
                     .build()
             )
 
-        betaMessageStream.use {
-            betaMessageStream.stream().forEach {
-                println(it)
-                it.validate()
-            }
+        betaMessageStreamResponse.use {
+            betaMessageStreamResponse.stream().forEach { betaMessage -> betaMessage.validate() }
         }
     }
 
     @Test
-    fun callCountTokens() {
+    fun countTokens() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val messageService = client.beta().messages()
+
         val betaMessageTokensCount =
             messageService.countTokens(
                 BetaMessageCountTokensParams.builder()
@@ -183,7 +182,7 @@ class MessageServiceTest {
                     )
                     .build()
             )
-        println(betaMessageTokensCount)
+
         betaMessageTokensCount.validate()
     }
 }

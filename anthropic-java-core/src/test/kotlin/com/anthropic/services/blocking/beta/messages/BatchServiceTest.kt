@@ -10,12 +10,14 @@ import com.anthropic.models.BetaCitationCharLocationParam
 import com.anthropic.models.BetaMessageBatchCancelParams
 import com.anthropic.models.BetaMessageBatchCreateParams
 import com.anthropic.models.BetaMessageBatchDeleteParams
+import com.anthropic.models.BetaMessageBatchResultsParams
 import com.anthropic.models.BetaMessageBatchRetrieveParams
 import com.anthropic.models.BetaMetadata
 import com.anthropic.models.BetaTextBlockParam
 import com.anthropic.models.BetaToolChoiceAuto
 import com.anthropic.models.BetaToolComputerUse20241022
 import com.anthropic.models.Model
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -23,13 +25,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 class BatchServiceTest {
 
     @Test
-    fun callCreate() {
+    fun create() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.beta().messages().batches()
+
         val betaMessageBatch =
             batchService.create(
                 BetaMessageBatchCreateParams.builder()
@@ -93,18 +96,19 @@ class BatchServiceTest {
                     )
                     .build()
             )
-        println(betaMessageBatch)
+
         betaMessageBatch.validate()
     }
 
     @Test
-    fun callRetrieve() {
+    fun retrieve() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.beta().messages().batches()
+
         val betaMessageBatch =
             batchService.retrieve(
                 BetaMessageBatchRetrieveParams.builder()
@@ -112,31 +116,33 @@ class BatchServiceTest {
                     .addBeta(AnthropicBeta.MESSAGE_BATCHES_2024_09_24)
                     .build()
             )
-        println(betaMessageBatch)
+
         betaMessageBatch.validate()
     }
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.beta().messages().batches()
-        val betaListResponseMessageBatch = batchService.list()
-        println(betaListResponseMessageBatch)
-        betaListResponseMessageBatch.data().forEach { it.validate() }
+
+        val page = batchService.list()
+
+        page.response().validate()
     }
 
     @Test
-    fun callDelete() {
+    fun delete() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.beta().messages().batches()
+
         val betaDeletedMessageBatch =
             batchService.delete(
                 BetaMessageBatchDeleteParams.builder()
@@ -144,18 +150,19 @@ class BatchServiceTest {
                     .addBeta(AnthropicBeta.MESSAGE_BATCHES_2024_09_24)
                     .build()
             )
-        println(betaDeletedMessageBatch)
+
         betaDeletedMessageBatch.validate()
     }
 
     @Test
-    fun callCancel() {
+    fun cancel() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val batchService = client.beta().messages().batches()
+
         val betaMessageBatch =
             batchService.cancel(
                 BetaMessageBatchCancelParams.builder()
@@ -163,7 +170,33 @@ class BatchServiceTest {
                     .addBeta(AnthropicBeta.MESSAGE_BATCHES_2024_09_24)
                     .build()
             )
-        println(betaMessageBatch)
+
         betaMessageBatch.validate()
+    }
+
+    @Disabled("Prism doesn't support JSONL responses yet")
+    @Test
+    fun resultsStreaming() {
+        val client =
+            AnthropicOkHttpClient.builder()
+                .baseUrl(TestServerExtension.BASE_URL)
+                .apiKey("my-anthropic-api-key")
+                .build()
+        val batchService = client.beta().messages().batches()
+
+        val betaMessageBatchIndividualResponseStreamResponse =
+            batchService.resultsStreaming(
+                BetaMessageBatchResultsParams.builder()
+                    .messageBatchId("message_batch_id")
+                    .addBeta(AnthropicBeta.MESSAGE_BATCHES_2024_09_24)
+                    .build()
+            )
+
+        betaMessageBatchIndividualResponseStreamResponse.use {
+            betaMessageBatchIndividualResponseStreamResponse.stream().forEach {
+                betaMessageBatchIndividualResponse ->
+                betaMessageBatchIndividualResponse.validate()
+            }
+        }
     }
 }
