@@ -12,29 +12,31 @@ import org.junit.jupiter.api.extension.ExtendWith
 class ModelServiceTest {
 
     @Test
-    fun callRetrieve() {
+    fun retrieve() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val modelService = client.models()
+
         val modelInfo =
             modelService.retrieve(ModelRetrieveParams.builder().modelId("model_id").build())
-        println(modelInfo)
+
         modelInfo.validate()
     }
 
     @Test
-    fun callList() {
+    fun list() {
         val client =
             AnthropicOkHttpClient.builder()
                 .baseUrl(TestServerExtension.BASE_URL)
                 .apiKey("my-anthropic-api-key")
                 .build()
         val modelService = client.models()
-        val listResponseModelInfo = modelService.list()
-        println(listResponseModelInfo)
-        listResponseModelInfo.data().forEach { it.validate() }
+
+        val page = modelService.list()
+
+        page.response().validate()
     }
 }
