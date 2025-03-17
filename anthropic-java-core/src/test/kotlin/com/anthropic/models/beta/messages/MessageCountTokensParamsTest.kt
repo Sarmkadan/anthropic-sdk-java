@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
-class MessageCountTokensParamsTest {
+internal class MessageCountTokensParamsTest {
 
     @Test
     fun create() {

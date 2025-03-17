@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
-class CompletionCreateParamsTest {
+internal class CompletionCreateParamsTest {
 
     @Test
     fun create() {
