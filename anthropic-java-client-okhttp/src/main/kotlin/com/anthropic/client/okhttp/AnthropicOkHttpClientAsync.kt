@@ -190,6 +190,11 @@ class AnthropicOkHttpClientAsync private constructor() {
         private fun ensureBackend(): Backend =
             backend ?: ensureDefaultBackendBuilder("ensureBackend").build()
 
+        /**
+         * Returns an immutable instance of [AnthropicClientAsync].
+         *
+         * Further updates to this [Builder] will not mutate the returned instance.
+         */
         fun build(): AnthropicClientAsync =
             AnthropicClientAsyncImpl(
                 clientOptions
