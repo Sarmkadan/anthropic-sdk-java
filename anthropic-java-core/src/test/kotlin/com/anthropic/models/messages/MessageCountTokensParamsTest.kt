@@ -4,9 +4,7 @@ package com.anthropic.models.messages
 
 import com.anthropic.core.JsonValue
 import kotlin.jvm.optionals.getOrNull
-import kotlin.test.assertNotNull
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 internal class MessageCountTokensParamsTest {
@@ -125,7 +123,6 @@ internal class MessageCountTokensParamsTest {
 
         val body = params._body()
 
-        assertNotNull(body)
         assertThat(body.messages())
             .containsExactly(
                 MessageParam.builder().content("Hello, world").role(MessageParam.Role.USER).build()
@@ -205,7 +202,6 @@ internal class MessageCountTokensParamsTest {
 
         val body = params._body()
 
-        assertNotNull(body)
         assertThat(body.messages())
             .containsExactly(
                 MessageParam.builder().content("Hello, world").role(MessageParam.Role.USER).build()
