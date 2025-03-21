@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    id("anthropic.java")
     application
 }
 
@@ -13,10 +13,9 @@ dependencies {
     implementation(project(":anthropic-java-vertex"))
 }
 
-java {
+tasks.withType<JavaCompile>().configureEach {
     // Allow using more modern APIs, like `List.of` and `Map.of`, in examples.
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    options.release.set(11)
 }
 
 application {
