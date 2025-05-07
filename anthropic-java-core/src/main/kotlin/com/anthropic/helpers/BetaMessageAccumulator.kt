@@ -144,6 +144,14 @@ class BetaMessageAccumulator private constructor() {
                         override fun visitBetaCitationContentBlockLocation(
                             contentBlockLocation: BetaCitationContentBlockLocation
                         ) = BetaTextCitation.ofCitationContentBlockLocation(contentBlockLocation)
+
+                        override fun visitBetaCitationsWebSearchResultLocation(
+                            betaCitationsWebSearchResultLocation:
+                                BetaCitationsWebSearchResultLocation
+                        ) =
+                            BetaTextCitation.ofCitationsWebSearchResultLocation(
+                                betaCitationsWebSearchResultLocation
+                            )
                     }
                 )
     }
@@ -249,6 +257,18 @@ class BetaMessageAccumulator private constructor() {
 
                                     override fun visitBetaToolUse(betaToolUse: BetaToolUseBlock) =
                                         BetaContentBlock.ofToolUse(betaToolUse)
+
+                                    override fun visitBetaServerToolUse(
+                                        betaServerToolUse: BetaServerToolUseBlock
+                                    ): BetaContentBlock =
+                                        BetaContentBlock.ofServerToolUse(betaServerToolUse)
+
+                                    override fun visitBetaWebSearchToolResult(
+                                        betaWebSearchToolResult: BetaWebSearchToolResultBlock
+                                    ): BetaContentBlock =
+                                        BetaContentBlock.ofWebSearchToolResult(
+                                            betaWebSearchToolResult
+                                        )
 
                                     override fun visitBetaThinking(
                                         betaThinking: BetaThinkingBlock

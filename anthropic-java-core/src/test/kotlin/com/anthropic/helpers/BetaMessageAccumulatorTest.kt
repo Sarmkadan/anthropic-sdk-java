@@ -29,12 +29,24 @@ internal class BetaMessageAccumulatorTest {
         val usage1 =
             BetaMessageAccumulator.mergeMessageUsage(
                 usage(INPUT_TOKENS),
-                BetaMessageDeltaUsage.builder().outputTokens(44L).build(),
+                BetaMessageDeltaUsage.builder()
+                    .outputTokens(44L)
+                    .cacheCreationInputTokens(0L)
+                    .cacheReadInputTokens(0L)
+                    .inputTokens(0L)
+                    .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
+                    .build(),
             )
         val usage2 =
             BetaMessageAccumulator.mergeMessageUsage(
                 usage1,
-                BetaMessageDeltaUsage.builder().outputTokens(11L).build(),
+                BetaMessageDeltaUsage.builder()
+                    .outputTokens(11L)
+                    .cacheCreationInputTokens(0L)
+                    .cacheReadInputTokens(0L)
+                    .inputTokens(0L)
+                    .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
+                    .build(),
             )
 
         assertThat(usage1.inputTokens()).isEqualTo(INPUT_TOKENS)
@@ -801,7 +813,15 @@ internal class BetaMessageAccumulatorTest {
                         .stopSequence(stopSequence)
                         .build()
                 )
-                .usage(BetaMessageDeltaUsage.builder().outputTokens(outputTokens).build())
+                .usage(
+                    BetaMessageDeltaUsage.builder()
+                        .outputTokens(outputTokens)
+                        .cacheCreationInputTokens(0L)
+                        .cacheReadInputTokens(0L)
+                        .inputTokens(0L)
+                        .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
+                        .build()
+                )
                 .build()
         )
 
@@ -934,6 +954,7 @@ internal class BetaMessageAccumulatorTest {
             .cacheCreationInputTokens(0L)
             .cacheReadInputTokens(0L)
             .outputTokens(0L)
+            .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
             .build()
 
     private fun textDelta(text: String) = BetaTextDelta.builder().text(text).build()

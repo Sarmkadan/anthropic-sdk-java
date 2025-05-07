@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.0 (2025-05-07)
+
+Full Changelog: [v1.3.1...v1.4.0](https://github.com/anthropics/anthropic-sdk-java/compare/v1.3.1...v1.4.0)
+
+### Features
+
+* **api:** adds web search capabilities to the Claude API ([6a873d4](https://github.com/anthropics/anthropic-sdk-java/commit/6a873d402f513166712df7dec070649bb66c3987))
+
+
+### Chores
+
+* disable configuration cache for releases ([c12dfb7](https://github.com/anthropics/anthropic-sdk-java/commit/c12dfb7026ca022d462dc759c22f8e98fa1e280d))
+* **internal:** remove flaky `-Xbackend-threads=0` option ([af5fd05](https://github.com/anthropics/anthropic-sdk-java/commit/af5fd05f87a476591db299359d9c1c16916435f2))
+
 ## 1.3.1 (2025-05-02)
 
 Full Changelog: [v1.3.0...v1.3.1](https://github.com/anthropics/anthropic-sdk-java/compare/v1.3.0...v1.3.1)
