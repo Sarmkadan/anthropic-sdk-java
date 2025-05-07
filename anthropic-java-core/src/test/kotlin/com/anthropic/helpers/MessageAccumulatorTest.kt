@@ -32,7 +32,7 @@ internal class MessageAccumulatorTest {
                     .outputTokens(44L)
                     .cacheCreationInputTokens(0L)
                     .cacheReadInputTokens(0L)
-                    .inputTokens(0L)
+                    .inputTokens(INPUT_TOKENS) // Use test constant
                     .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
                     .build(),
             )
@@ -43,7 +43,7 @@ internal class MessageAccumulatorTest {
                     .outputTokens(11L)
                     .cacheCreationInputTokens(0L)
                     .cacheReadInputTokens(0L)
-                    .inputTokens(0L)
+                    .inputTokens(INPUT_TOKENS) // Use test constant
                     .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
                     .build(),
             )
@@ -52,7 +52,7 @@ internal class MessageAccumulatorTest {
         assertThat(usage1.outputTokens()).isEqualTo(44L)
 
         assertThat(usage2.inputTokens()).isEqualTo(INPUT_TOKENS)
-        assertThat(usage2.outputTokens()).isEqualTo(44L + 11L)
+        assertThat(usage2.outputTokens()).isEqualTo(11L)
     }
 
     @Test
@@ -451,7 +451,7 @@ internal class MessageAccumulatorTest {
         accumulator.accumulate(messageStopEvent())
 
         assertThat(accumulator.message().usage().inputTokens()).isEqualTo(INPUT_TOKENS)
-        assertThat(accumulator.message().usage().outputTokens()).isEqualTo(11L + 12L + 13L)
+        assertThat(accumulator.message().usage().outputTokens()).isEqualTo(13L)
     }
 
     @Test
@@ -847,6 +847,10 @@ internal class MessageAccumulatorTest {
         stopReason: JsonField<StopReason> = NOT_SET,
         stopSequence: JsonField<String> = NOT_SET,
         outputTokens: Long = 0L,
+        inputTokens: Long = INPUT_TOKENS,
+        cacheCreationInputTokens: Long = 0L,
+        cacheReadInputTokens: Long = 0L,
+        webSearchRequests: Long = 0L,
     ) =
         RawMessageStreamEvent.ofDelta(
             RawMessageDeltaEvent.builder()
@@ -859,10 +863,12 @@ internal class MessageAccumulatorTest {
                 .usage(
                     MessageDeltaUsage.builder()
                         .outputTokens(outputTokens)
-                        .cacheCreationInputTokens(0L)
-                        .cacheReadInputTokens(0L)
-                        .inputTokens(0L)
-                        .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
+                        .cacheCreationInputTokens(cacheCreationInputTokens)
+                        .cacheReadInputTokens(cacheReadInputTokens)
+                        .inputTokens(inputTokens)
+                        .serverToolUse(
+                            ServerToolUsage.builder().webSearchRequests(webSearchRequests).build()
+                        )
                         .build()
                 )
                 .build()

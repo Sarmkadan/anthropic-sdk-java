@@ -33,7 +33,7 @@ internal class BetaMessageAccumulatorTest {
                     .outputTokens(44L)
                     .cacheCreationInputTokens(0L)
                     .cacheReadInputTokens(0L)
-                    .inputTokens(0L)
+                    .inputTokens(INPUT_TOKENS) // Use test constant
                     .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
                     .build(),
             )
@@ -44,7 +44,7 @@ internal class BetaMessageAccumulatorTest {
                     .outputTokens(11L)
                     .cacheCreationInputTokens(0L)
                     .cacheReadInputTokens(0L)
-                    .inputTokens(0L)
+                    .inputTokens(INPUT_TOKENS) // Use test constant
                     .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
                     .build(),
             )
@@ -53,7 +53,7 @@ internal class BetaMessageAccumulatorTest {
         assertThat(usage1.outputTokens()).isEqualTo(44L)
 
         assertThat(usage2.inputTokens()).isEqualTo(INPUT_TOKENS)
-        assertThat(usage2.outputTokens()).isEqualTo(44L + 11L)
+        assertThat(usage2.outputTokens()).isEqualTo(11L)
     }
 
     @Test
@@ -456,7 +456,7 @@ internal class BetaMessageAccumulatorTest {
         accumulator.accumulate(messageStopEvent())
 
         assertThat(accumulator.message().usage().inputTokens()).isEqualTo(INPUT_TOKENS)
-        assertThat(accumulator.message().usage().outputTokens()).isEqualTo(11L + 12L + 13L)
+        assertThat(accumulator.message().usage().outputTokens()).isEqualTo(13L)
     }
 
     @Test
@@ -804,6 +804,10 @@ internal class BetaMessageAccumulatorTest {
         stopReason: JsonField<BetaStopReason> = NOT_SET,
         stopSequence: JsonField<String> = NOT_SET,
         outputTokens: Long = 0L,
+        inputTokens: Long = INPUT_TOKENS,
+        cacheCreationInputTokens: Long = 0L,
+        cacheReadInputTokens: Long = 0L,
+        webSearchRequests: Long = 0L,
     ) =
         BetaRawMessageStreamEvent.ofDelta(
             BetaRawMessageDeltaEvent.builder()
@@ -816,10 +820,14 @@ internal class BetaMessageAccumulatorTest {
                 .usage(
                     BetaMessageDeltaUsage.builder()
                         .outputTokens(outputTokens)
-                        .cacheCreationInputTokens(0L)
-                        .cacheReadInputTokens(0L)
-                        .inputTokens(0L)
-                        .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
+                        .cacheCreationInputTokens(cacheCreationInputTokens)
+                        .cacheReadInputTokens(cacheReadInputTokens)
+                        .inputTokens(inputTokens)
+                        .serverToolUse(
+                            BetaServerToolUsage.builder()
+                                .webSearchRequests(webSearchRequests)
+                                .build()
+                        )
                         .build()
                 )
                 .build()
