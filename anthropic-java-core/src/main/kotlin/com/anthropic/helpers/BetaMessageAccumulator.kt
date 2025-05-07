@@ -58,8 +58,34 @@ class BetaMessageAccumulator private constructor() {
         @JvmStatic fun create() = BetaMessageAccumulator()
 
         @JvmSynthetic
-        internal fun mergeMessageUsage(usage: BetaUsage, deltaUsage: BetaMessageDeltaUsage) =
-            usage.toBuilder().outputTokens(usage.outputTokens() + deltaUsage.outputTokens()).build()
+        internal fun mergeMessageUsage(
+            usage: BetaUsage,
+            deltaUsage: BetaMessageDeltaUsage,
+        ): BetaUsage {
+            val builder = usage.toBuilder()
+
+            if (!deltaUsage._outputTokens().isMissing()) {
+                builder.outputTokens(deltaUsage.outputTokens())
+            }
+
+            if (!deltaUsage._inputTokens().isMissing()) {
+                builder.inputTokens(deltaUsage.inputTokens().orElse(0))
+            }
+
+            if (!deltaUsage._cacheCreationInputTokens().isMissing()) {
+                builder.cacheCreationInputTokens(deltaUsage.cacheCreationInputTokens())
+            }
+
+            if (!deltaUsage._cacheReadInputTokens().isMissing()) {
+                builder.cacheReadInputTokens(deltaUsage.cacheReadInputTokens())
+            }
+
+            if (!deltaUsage._serverToolUse().isMissing()) {
+                builder.serverToolUse(deltaUsage.serverToolUse())
+            }
+
+            return builder.build()
+        }
 
         @JvmSynthetic
         internal fun mergeTextDelta(

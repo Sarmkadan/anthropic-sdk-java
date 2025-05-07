@@ -86,8 +86,31 @@ class MessageAccumulator private constructor() {
         @JvmStatic fun create() = MessageAccumulator()
 
         @JvmSynthetic
-        internal fun mergeMessageUsage(usage: Usage, deltaUsage: MessageDeltaUsage) =
-            usage.toBuilder().outputTokens(usage.outputTokens() + deltaUsage.outputTokens()).build()
+        internal fun mergeMessageUsage(usage: Usage, deltaUsage: MessageDeltaUsage): Usage {
+            val builder = usage.toBuilder()
+
+            if (!deltaUsage._outputTokens().isMissing()) {
+                builder.outputTokens(deltaUsage.outputTokens())
+            }
+
+            if (!deltaUsage._inputTokens().isMissing()) {
+                builder.inputTokens(deltaUsage.inputTokens().orElse(0))
+            }
+
+            if (!deltaUsage._cacheCreationInputTokens().isMissing()) {
+                builder.cacheCreationInputTokens(deltaUsage.cacheCreationInputTokens())
+            }
+
+            if (!deltaUsage._cacheReadInputTokens().isMissing()) {
+                builder.cacheReadInputTokens(deltaUsage.cacheReadInputTokens())
+            }
+
+            if (!deltaUsage._serverToolUse().isMissing()) {
+                builder.serverToolUse(deltaUsage.serverToolUse())
+            }
+
+            return builder.build()
+        }
 
         @JvmSynthetic
         internal fun mergeTextDelta(
