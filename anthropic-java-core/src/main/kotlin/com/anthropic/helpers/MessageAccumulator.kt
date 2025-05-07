@@ -8,6 +8,7 @@ import com.anthropic.models.messages.CitationCharLocation
 import com.anthropic.models.messages.CitationContentBlockLocation
 import com.anthropic.models.messages.CitationPageLocation
 import com.anthropic.models.messages.CitationsDelta
+import com.anthropic.models.messages.CitationsWebSearchResultLocation
 import com.anthropic.models.messages.ContentBlock
 import com.anthropic.models.messages.InputJsonDelta
 import com.anthropic.models.messages.Message
@@ -21,6 +22,7 @@ import com.anthropic.models.messages.RawMessageStartEvent
 import com.anthropic.models.messages.RawMessageStopEvent
 import com.anthropic.models.messages.RawMessageStreamEvent
 import com.anthropic.models.messages.RedactedThinkingBlock
+import com.anthropic.models.messages.ServerToolUseBlock
 import com.anthropic.models.messages.SignatureDelta
 import com.anthropic.models.messages.TextBlock
 import com.anthropic.models.messages.TextCitation
@@ -29,6 +31,7 @@ import com.anthropic.models.messages.ThinkingBlock
 import com.anthropic.models.messages.ThinkingDelta
 import com.anthropic.models.messages.ToolUseBlock
 import com.anthropic.models.messages.Usage
+import com.anthropic.models.messages.WebSearchToolResultBlock
 
 /**
  * An accumulator that constructs a [Message] from a sequence of streamed events. Pass all events
@@ -167,6 +170,13 @@ class MessageAccumulator private constructor() {
                         override fun visitContentBlockLocation(
                             contentBlockLocation: CitationContentBlockLocation
                         ) = TextCitation.ofCitationContentBlockLocation(contentBlockLocation)
+
+                        override fun visitCitationsWebSearchResultLocation(
+                            citationsWebSearchResultLocation: CitationsWebSearchResultLocation
+                        ) =
+                            TextCitation.ofCitationsWebSearchResultLocation(
+                                citationsWebSearchResultLocation
+                            )
                     }
                 )
     }
@@ -268,6 +278,15 @@ class MessageAccumulator private constructor() {
 
                                     override fun visitToolUse(toolUse: ToolUseBlock) =
                                         ContentBlock.ofToolUse(toolUse)
+
+                                    override fun visitServerToolUse(
+                                        serverToolUse: ServerToolUseBlock
+                                    ): ContentBlock = ContentBlock.ofServerToolUse(serverToolUse)
+
+                                    override fun visitWebSearchToolResult(
+                                        webSearchToolResult: WebSearchToolResultBlock
+                                    ): ContentBlock =
+                                        ContentBlock.ofWebSearchToolResult(webSearchToolResult)
 
                                     override fun visitThinking(thinking: ThinkingBlock) =
                                         ContentBlock.ofThinking(thinking)

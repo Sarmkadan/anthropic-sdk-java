@@ -28,12 +28,24 @@ internal class MessageAccumulatorTest {
         val usage1 =
             MessageAccumulator.mergeMessageUsage(
                 usage(INPUT_TOKENS),
-                MessageDeltaUsage.builder().outputTokens(44L).build(),
+                MessageDeltaUsage.builder()
+                    .outputTokens(44L)
+                    .cacheCreationInputTokens(0L)
+                    .cacheReadInputTokens(0L)
+                    .inputTokens(0L)
+                    .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
+                    .build(),
             )
         val usage2 =
             MessageAccumulator.mergeMessageUsage(
                 usage1,
-                MessageDeltaUsage.builder().outputTokens(11L).build(),
+                MessageDeltaUsage.builder()
+                    .outputTokens(11L)
+                    .cacheCreationInputTokens(0L)
+                    .cacheReadInputTokens(0L)
+                    .inputTokens(0L)
+                    .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
+                    .build(),
             )
 
         assertThat(usage1.inputTokens()).isEqualTo(INPUT_TOKENS)
@@ -844,7 +856,15 @@ internal class MessageAccumulatorTest {
                         .stopSequence(stopSequence)
                         .build()
                 )
-                .usage(MessageDeltaUsage.builder().outputTokens(outputTokens).build())
+                .usage(
+                    MessageDeltaUsage.builder()
+                        .outputTokens(outputTokens)
+                        .cacheCreationInputTokens(0L)
+                        .cacheReadInputTokens(0L)
+                        .inputTokens(0L)
+                        .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
+                        .build()
+                )
                 .build()
         )
 
@@ -977,6 +997,7 @@ internal class MessageAccumulatorTest {
             .cacheCreationInputTokens(0L)
             .cacheReadInputTokens(0L)
             .outputTokens(0L)
+            .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
             .build()
 
     private fun textDelta(text: String) = TextDelta.builder().text(text).build()
