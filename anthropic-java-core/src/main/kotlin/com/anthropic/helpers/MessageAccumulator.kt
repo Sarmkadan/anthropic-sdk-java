@@ -262,6 +262,7 @@ class MessageAccumulator private constructor() {
                         requireMessageBuilder().stopSequence(delta.stopSequence().get())
                     }
 
+                    // Ensure we properly update the usage information from the delta event
                     messageUsage = mergeMessageUsage(requireMessageUsage(), deltaEvent.usage())
                 }
 
