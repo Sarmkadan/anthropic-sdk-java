@@ -869,6 +869,11 @@ MessageCreateParams params = MessageCreateParams.builder()
 
 These can be accessed on the built object later using the `_additionalHeaders()`, `_additionalQueryParams()`, and `_additionalBodyProperties()` methods.
 
+> [!WARNING]
+> The values passed to these methods overwrite values passed to earlier methods.
+>
+> For security reasons, ensure these methods are only used with trusted input data.
+
 To set undocumented parameters on _nested_ headers, query params, or body classes, call the `putAdditionalProperty` method on the nested class:
 
 ```java
