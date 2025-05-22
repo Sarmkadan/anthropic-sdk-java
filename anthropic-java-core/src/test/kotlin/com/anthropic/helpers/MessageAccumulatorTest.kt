@@ -1003,6 +1003,7 @@ internal class MessageAccumulatorTest {
             .cacheReadInputTokens(0L)
             .outputTokens(0L)
             .serverToolUse(ServerToolUsage.builder().webSearchRequests(0L).build())
+            .serviceTier(Usage.ServiceTier.STANDARD)
             .build()
 
     private fun textDelta(text: String) = TextDelta.builder().text(text).build()

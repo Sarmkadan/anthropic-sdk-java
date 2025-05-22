@@ -87,7 +87,11 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaultTimeoutFromMaxTokens(params.maxTokens(), isStreaming = false)
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokens(),
+                        isStreaming = false,
+                        model = params.model().toString(),
+                    )
             val response = clientOptions.httpClient.execute(request, requestOptions)
             return response.parseable {
                 response
@@ -129,7 +133,11 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaultTimeoutFromMaxTokens(params.maxTokens(), isStreaming = true)
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokens(),
+                        isStreaming = true,
+                        model = params.model().toString(),
+                    )
             val response = clientOptions.httpClient.execute(request, requestOptions)
             return response.parseable {
                 response

@@ -238,6 +238,10 @@ class BetaMessageAccumulator private constructor() {
                         requireMessageBuilder().stopSequence(delta.stopSequence().get())
                     }
 
+                    if (delta.container().isPresent()) {
+                        requireMessageBuilder().container(delta.container().get())
+                    }
+
                     messageUsage = mergeMessageUsage(requireMessageUsage(), deltaEvent.usage())
                 }
 
@@ -293,6 +297,32 @@ class BetaMessageAccumulator private constructor() {
                                         BetaContentBlock.ofWebSearchToolResult(
                                             betaWebSearchToolResult
                                         )
+
+                                    override fun visitCodeExecutionToolResult(
+                                        codeExecutionToolResult: BetaCodeExecutionToolResultBlock
+                                    ): BetaContentBlock {
+                                        return BetaContentBlock.ofCodeExecutionToolResult(
+                                            codeExecutionToolResult
+                                        )
+                                    }
+
+                                    override fun visitMcpToolUse(
+                                        mcpToolUse: BetaMcpToolUseBlock
+                                    ): BetaContentBlock {
+                                        return BetaContentBlock.ofMcpToolUse(mcpToolUse)
+                                    }
+
+                                    override fun visitMcpToolResult(
+                                        mcpToolResult: BetaMcpToolResultBlock
+                                    ): BetaContentBlock {
+                                        return BetaContentBlock.ofMcpToolResult(mcpToolResult)
+                                    }
+
+                                    override fun visitContainerUpload(
+                                        containerUpload: BetaContainerUploadBlock
+                                    ): BetaContentBlock {
+                                        return BetaContentBlock.ofContainerUpload(containerUpload)
+                                    }
 
                                     override fun visitThinking(betaThinking: BetaThinkingBlock) =
                                         BetaContentBlock.ofThinking(betaThinking)
@@ -380,6 +410,26 @@ class BetaMessageAccumulator private constructor() {
                             BetaContentBlock.ofToolUse(
                                 oldContentBlock
                                     .asToolUse()
+                                    .toBuilder()
+                                    // Anthropic Streaming Messages API: "the final `tool_use.input`
+                                    // is always an _object_."
+                                    .input(JSON_MAPPER.readValue(inputJson, JsonObject::class.java))
+                                    .build()
+                            )
+                    }
+
+                    if (oldContentBlock.isMcpToolUse()) {
+                        // Check that there was at least one delta, so a potentially-valid `input`
+                        // JSON string was accumulated.
+                        inputJson
+                            ?: throw AnthropicInvalidDataException(
+                                "Missing input JSON for index $index."
+                            )
+
+                        messageContent[index] =
+                            BetaContentBlock.ofMcpToolUse(
+                                oldContentBlock
+                                    .asMcpToolUse()
                                     .toBuilder()
                                     // Anthropic Streaming Messages API: "the final `tool_use.input`
                                     // is always an _object_."

@@ -21,7 +21,6 @@ import com.anthropic.core.http.parseable
 import com.anthropic.core.prepare
 import com.anthropic.models.completions.Completion
 import com.anthropic.models.completions.CompletionCreateParams
-import java.time.Duration
 
 class CompletionServiceImpl internal constructor(private val clientOptions: ClientOptions) :
     CompletionService {
@@ -68,7 +67,11 @@ class CompletionServiceImpl internal constructor(private val clientOptions: Clie
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaults(RequestOptions.builder().timeout(Duration.ofMinutes(10)).build())
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokensToSample(),
+                        isStreaming = false,
+                        model = params.model().toString(),
+                    )
             val response = clientOptions.httpClient.execute(request, requestOptions)
             return response.parseable {
                 response
@@ -109,7 +112,11 @@ class CompletionServiceImpl internal constructor(private val clientOptions: Clie
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaults(RequestOptions.builder().timeout(Duration.ofMinutes(10)).build())
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokensToSample(),
+                        isStreaming = true,
+                        model = params.model().toString(),
+                    )
             val response = clientOptions.httpClient.execute(request, requestOptions)
             return response.parseable {
                 response
