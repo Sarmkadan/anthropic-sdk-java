@@ -18,41 +18,81 @@ import java.util.Objects
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
+/** Regular text content. */
 @JsonDeserialize(using = BetaContentBlockParam.Deserializer::class)
 @JsonSerialize(using = BetaContentBlockParam.Serializer::class)
 class BetaContentBlockParam
 private constructor(
+    private val serverToolUse: BetaServerToolUseBlockParam? = null,
+    private val webSearchToolResult: BetaWebSearchToolResultBlockParam? = null,
+    private val codeExecutionToolResult: BetaCodeExecutionToolResultBlockParam? = null,
+    private val mcpToolUse: BetaMcpToolUseBlockParam? = null,
+    private val mcpToolResult: BetaRequestMcpToolResultBlockParam? = null,
     private val text: BetaTextBlockParam? = null,
     private val image: BetaImageBlockParam? = null,
     private val toolUse: BetaToolUseBlockParam? = null,
-    private val serverToolUse: BetaServerToolUseBlockParam? = null,
-    private val webSearchToolResult: BetaWebSearchToolResultBlockParam? = null,
     private val toolResult: BetaToolResultBlockParam? = null,
-    private val base64PdfBlock: BetaBase64PdfBlock? = null,
+    private val document: BetaBase64PdfBlock? = null,
     private val thinking: BetaThinkingBlockParam? = null,
     private val redactedThinking: BetaRedactedThinkingBlockParam? = null,
+    private val containerUpload: BetaContainerUploadBlockParam? = null,
     private val _json: JsonValue? = null,
 ) {
-
-    fun text(): Optional<BetaTextBlockParam> = Optional.ofNullable(text)
-
-    fun image(): Optional<BetaImageBlockParam> = Optional.ofNullable(image)
-
-    fun toolUse(): Optional<BetaToolUseBlockParam> = Optional.ofNullable(toolUse)
 
     fun serverToolUse(): Optional<BetaServerToolUseBlockParam> = Optional.ofNullable(serverToolUse)
 
     fun webSearchToolResult(): Optional<BetaWebSearchToolResultBlockParam> =
         Optional.ofNullable(webSearchToolResult)
 
+    fun codeExecutionToolResult(): Optional<BetaCodeExecutionToolResultBlockParam> =
+        Optional.ofNullable(codeExecutionToolResult)
+
+    fun mcpToolUse(): Optional<BetaMcpToolUseBlockParam> = Optional.ofNullable(mcpToolUse)
+
+    fun mcpToolResult(): Optional<BetaRequestMcpToolResultBlockParam> =
+        Optional.ofNullable(mcpToolResult)
+
+    /** Regular text content. */
+    fun text(): Optional<BetaTextBlockParam> = Optional.ofNullable(text)
+
+    /** Image content specified directly as base64 data or as a reference via a URL. */
+    fun image(): Optional<BetaImageBlockParam> = Optional.ofNullable(image)
+
+    /** A block indicating a tool use by the model. */
+    fun toolUse(): Optional<BetaToolUseBlockParam> = Optional.ofNullable(toolUse)
+
+    /** A block specifying the results of a tool use by the model. */
     fun toolResult(): Optional<BetaToolResultBlockParam> = Optional.ofNullable(toolResult)
 
-    fun base64PdfBlock(): Optional<BetaBase64PdfBlock> = Optional.ofNullable(base64PdfBlock)
+    /**
+     * Document content, either specified directly as base64 data, as text, or as a reference via a
+     * URL.
+     */
+    fun document(): Optional<BetaBase64PdfBlock> = Optional.ofNullable(document)
 
+    /** A block specifying internal thinking by the model. */
     fun thinking(): Optional<BetaThinkingBlockParam> = Optional.ofNullable(thinking)
 
+    /** A block specifying internal, redacted thinking by the model. */
     fun redactedThinking(): Optional<BetaRedactedThinkingBlockParam> =
         Optional.ofNullable(redactedThinking)
+
+    /**
+     * A content block that represents a file to be uploaded to the container Files uploaded via
+     * this block will be available in the container's input directory.
+     */
+    fun containerUpload(): Optional<BetaContainerUploadBlockParam> =
+        Optional.ofNullable(containerUpload)
+
+    fun isServerToolUse(): Boolean = serverToolUse != null
+
+    fun isWebSearchToolResult(): Boolean = webSearchToolResult != null
+
+    fun isCodeExecutionToolResult(): Boolean = codeExecutionToolResult != null
+
+    fun isMcpToolUse(): Boolean = mcpToolUse != null
+
+    fun isMcpToolResult(): Boolean = mcpToolResult != null
 
     fun isText(): Boolean = text != null
 
@@ -60,51 +100,79 @@ private constructor(
 
     fun isToolUse(): Boolean = toolUse != null
 
-    fun isServerToolUse(): Boolean = serverToolUse != null
-
-    fun isWebSearchToolResult(): Boolean = webSearchToolResult != null
-
     fun isToolResult(): Boolean = toolResult != null
 
-    fun isBase64PdfBlock(): Boolean = base64PdfBlock != null
+    fun isDocument(): Boolean = document != null
 
     fun isThinking(): Boolean = thinking != null
 
     fun isRedactedThinking(): Boolean = redactedThinking != null
 
-    fun asText(): BetaTextBlockParam = text.getOrThrow("text")
-
-    fun asImage(): BetaImageBlockParam = image.getOrThrow("image")
-
-    fun asToolUse(): BetaToolUseBlockParam = toolUse.getOrThrow("toolUse")
+    fun isContainerUpload(): Boolean = containerUpload != null
 
     fun asServerToolUse(): BetaServerToolUseBlockParam = serverToolUse.getOrThrow("serverToolUse")
 
     fun asWebSearchToolResult(): BetaWebSearchToolResultBlockParam =
         webSearchToolResult.getOrThrow("webSearchToolResult")
 
+    fun asCodeExecutionToolResult(): BetaCodeExecutionToolResultBlockParam =
+        codeExecutionToolResult.getOrThrow("codeExecutionToolResult")
+
+    fun asMcpToolUse(): BetaMcpToolUseBlockParam = mcpToolUse.getOrThrow("mcpToolUse")
+
+    fun asMcpToolResult(): BetaRequestMcpToolResultBlockParam =
+        mcpToolResult.getOrThrow("mcpToolResult")
+
+    /** Regular text content. */
+    fun asText(): BetaTextBlockParam = text.getOrThrow("text")
+
+    /** Image content specified directly as base64 data or as a reference via a URL. */
+    fun asImage(): BetaImageBlockParam = image.getOrThrow("image")
+
+    /** A block indicating a tool use by the model. */
+    fun asToolUse(): BetaToolUseBlockParam = toolUse.getOrThrow("toolUse")
+
+    /** A block specifying the results of a tool use by the model. */
     fun asToolResult(): BetaToolResultBlockParam = toolResult.getOrThrow("toolResult")
 
-    fun asBase64PdfBlock(): BetaBase64PdfBlock = base64PdfBlock.getOrThrow("base64PdfBlock")
+    /**
+     * Document content, either specified directly as base64 data, as text, or as a reference via a
+     * URL.
+     */
+    fun asDocument(): BetaBase64PdfBlock = document.getOrThrow("document")
 
+    /** A block specifying internal thinking by the model. */
     fun asThinking(): BetaThinkingBlockParam = thinking.getOrThrow("thinking")
 
+    /** A block specifying internal, redacted thinking by the model. */
     fun asRedactedThinking(): BetaRedactedThinkingBlockParam =
         redactedThinking.getOrThrow("redactedThinking")
+
+    /**
+     * A content block that represents a file to be uploaded to the container Files uploaded via
+     * this block will be available in the container's input directory.
+     */
+    fun asContainerUpload(): BetaContainerUploadBlockParam =
+        containerUpload.getOrThrow("containerUpload")
 
     fun _json(): Optional<JsonValue> = Optional.ofNullable(_json)
 
     fun <T> accept(visitor: Visitor<T>): T =
         when {
+            serverToolUse != null -> visitor.visitServerToolUse(serverToolUse)
+            webSearchToolResult != null -> visitor.visitWebSearchToolResult(webSearchToolResult)
+            codeExecutionToolResult != null ->
+                visitor.visitCodeExecutionToolResult(codeExecutionToolResult)
+            mcpToolUse != null -> visitor.visitMcpToolUse(mcpToolUse)
+            mcpToolResult != null -> visitor.visitMcpToolResult(mcpToolResult)
             text != null -> visitor.visitText(text)
             image != null -> visitor.visitImage(image)
             toolUse != null -> visitor.visitToolUse(toolUse)
-            serverToolUse != null -> visitor.visitServerToolUse(serverToolUse)
-            webSearchToolResult != null -> visitor.visitWebSearchToolResult(webSearchToolResult)
             toolResult != null -> visitor.visitToolResult(toolResult)
-            base64PdfBlock != null -> visitor.visitBase64PdfBlock(base64PdfBlock)
+            document != null -> visitor.visitDocument(document)
             thinking != null -> visitor.visitThinking(thinking)
             redactedThinking != null -> visitor.visitRedactedThinking(redactedThinking)
+            containerUpload != null -> visitor.visitContainerUpload(containerUpload)
             else -> visitor.unknown(_json)
         }
 
@@ -117,6 +185,30 @@ private constructor(
 
         accept(
             object : Visitor<Unit> {
+                override fun visitServerToolUse(serverToolUse: BetaServerToolUseBlockParam) {
+                    serverToolUse.validate()
+                }
+
+                override fun visitWebSearchToolResult(
+                    webSearchToolResult: BetaWebSearchToolResultBlockParam
+                ) {
+                    webSearchToolResult.validate()
+                }
+
+                override fun visitCodeExecutionToolResult(
+                    codeExecutionToolResult: BetaCodeExecutionToolResultBlockParam
+                ) {
+                    codeExecutionToolResult.validate()
+                }
+
+                override fun visitMcpToolUse(mcpToolUse: BetaMcpToolUseBlockParam) {
+                    mcpToolUse.validate()
+                }
+
+                override fun visitMcpToolResult(mcpToolResult: BetaRequestMcpToolResultBlockParam) {
+                    mcpToolResult.validate()
+                }
+
                 override fun visitText(text: BetaTextBlockParam) {
                     text.validate()
                 }
@@ -129,22 +221,12 @@ private constructor(
                     toolUse.validate()
                 }
 
-                override fun visitServerToolUse(serverToolUse: BetaServerToolUseBlockParam) {
-                    serverToolUse.validate()
-                }
-
-                override fun visitWebSearchToolResult(
-                    webSearchToolResult: BetaWebSearchToolResultBlockParam
-                ) {
-                    webSearchToolResult.validate()
-                }
-
                 override fun visitToolResult(toolResult: BetaToolResultBlockParam) {
                     toolResult.validate()
                 }
 
-                override fun visitBase64PdfBlock(base64PdfBlock: BetaBase64PdfBlock) {
-                    base64PdfBlock.validate()
+                override fun visitDocument(document: BetaBase64PdfBlock) {
+                    document.validate()
                 }
 
                 override fun visitThinking(thinking: BetaThinkingBlockParam) {
@@ -155,6 +237,10 @@ private constructor(
                     redactedThinking: BetaRedactedThinkingBlockParam
                 ) {
                     redactedThinking.validate()
+                }
+
+                override fun visitContainerUpload(containerUpload: BetaContainerUploadBlockParam) {
+                    containerUpload.validate()
                 }
             }
         )
@@ -178,12 +264,6 @@ private constructor(
     internal fun validity(): Int =
         accept(
             object : Visitor<Int> {
-                override fun visitText(text: BetaTextBlockParam) = text.validity()
-
-                override fun visitImage(image: BetaImageBlockParam) = image.validity()
-
-                override fun visitToolUse(toolUse: BetaToolUseBlockParam) = toolUse.validity()
-
                 override fun visitServerToolUse(serverToolUse: BetaServerToolUseBlockParam) =
                     serverToolUse.validity()
 
@@ -191,17 +271,35 @@ private constructor(
                     webSearchToolResult: BetaWebSearchToolResultBlockParam
                 ) = webSearchToolResult.validity()
 
+                override fun visitCodeExecutionToolResult(
+                    codeExecutionToolResult: BetaCodeExecutionToolResultBlockParam
+                ) = codeExecutionToolResult.validity()
+
+                override fun visitMcpToolUse(mcpToolUse: BetaMcpToolUseBlockParam) =
+                    mcpToolUse.validity()
+
+                override fun visitMcpToolResult(mcpToolResult: BetaRequestMcpToolResultBlockParam) =
+                    mcpToolResult.validity()
+
+                override fun visitText(text: BetaTextBlockParam) = text.validity()
+
+                override fun visitImage(image: BetaImageBlockParam) = image.validity()
+
+                override fun visitToolUse(toolUse: BetaToolUseBlockParam) = toolUse.validity()
+
                 override fun visitToolResult(toolResult: BetaToolResultBlockParam) =
                     toolResult.validity()
 
-                override fun visitBase64PdfBlock(base64PdfBlock: BetaBase64PdfBlock) =
-                    base64PdfBlock.validity()
+                override fun visitDocument(document: BetaBase64PdfBlock) = document.validity()
 
                 override fun visitThinking(thinking: BetaThinkingBlockParam) = thinking.validity()
 
                 override fun visitRedactedThinking(
                     redactedThinking: BetaRedactedThinkingBlockParam
                 ) = redactedThinking.validity()
+
+                override fun visitContainerUpload(containerUpload: BetaContainerUploadBlockParam) =
+                    containerUpload.validity()
 
                 override fun unknown(json: JsonValue?) = 0
             }
@@ -212,35 +310,33 @@ private constructor(
             return true
         }
 
-        return /* spotless:off */ other is BetaContentBlockParam && text == other.text && image == other.image && toolUse == other.toolUse && serverToolUse == other.serverToolUse && webSearchToolResult == other.webSearchToolResult && toolResult == other.toolResult && base64PdfBlock == other.base64PdfBlock && thinking == other.thinking && redactedThinking == other.redactedThinking /* spotless:on */
+        return /* spotless:off */ other is BetaContentBlockParam && serverToolUse == other.serverToolUse && webSearchToolResult == other.webSearchToolResult && codeExecutionToolResult == other.codeExecutionToolResult && mcpToolUse == other.mcpToolUse && mcpToolResult == other.mcpToolResult && text == other.text && image == other.image && toolUse == other.toolUse && toolResult == other.toolResult && document == other.document && thinking == other.thinking && redactedThinking == other.redactedThinking && containerUpload == other.containerUpload /* spotless:on */
     }
 
-    override fun hashCode(): Int = /* spotless:off */ Objects.hash(text, image, toolUse, serverToolUse, webSearchToolResult, toolResult, base64PdfBlock, thinking, redactedThinking) /* spotless:on */
+    override fun hashCode(): Int = /* spotless:off */ Objects.hash(serverToolUse, webSearchToolResult, codeExecutionToolResult, mcpToolUse, mcpToolResult, text, image, toolUse, toolResult, document, thinking, redactedThinking, containerUpload) /* spotless:on */
 
     override fun toString(): String =
         when {
-            text != null -> "BetaContentBlockParam{text=$text}"
-            image != null -> "BetaContentBlockParam{image=$image}"
-            toolUse != null -> "BetaContentBlockParam{toolUse=$toolUse}"
             serverToolUse != null -> "BetaContentBlockParam{serverToolUse=$serverToolUse}"
             webSearchToolResult != null ->
                 "BetaContentBlockParam{webSearchToolResult=$webSearchToolResult}"
+            codeExecutionToolResult != null ->
+                "BetaContentBlockParam{codeExecutionToolResult=$codeExecutionToolResult}"
+            mcpToolUse != null -> "BetaContentBlockParam{mcpToolUse=$mcpToolUse}"
+            mcpToolResult != null -> "BetaContentBlockParam{mcpToolResult=$mcpToolResult}"
+            text != null -> "BetaContentBlockParam{text=$text}"
+            image != null -> "BetaContentBlockParam{image=$image}"
+            toolUse != null -> "BetaContentBlockParam{toolUse=$toolUse}"
             toolResult != null -> "BetaContentBlockParam{toolResult=$toolResult}"
-            base64PdfBlock != null -> "BetaContentBlockParam{base64PdfBlock=$base64PdfBlock}"
+            document != null -> "BetaContentBlockParam{document=$document}"
             thinking != null -> "BetaContentBlockParam{thinking=$thinking}"
             redactedThinking != null -> "BetaContentBlockParam{redactedThinking=$redactedThinking}"
+            containerUpload != null -> "BetaContentBlockParam{containerUpload=$containerUpload}"
             _json != null -> "BetaContentBlockParam{_unknown=$_json}"
             else -> throw IllegalStateException("Invalid BetaContentBlockParam")
         }
 
     companion object {
-
-        @JvmStatic fun ofText(text: BetaTextBlockParam) = BetaContentBlockParam(text = text)
-
-        @JvmStatic fun ofImage(image: BetaImageBlockParam) = BetaContentBlockParam(image = image)
-
-        @JvmStatic
-        fun ofToolUse(toolUse: BetaToolUseBlockParam) = BetaContentBlockParam(toolUse = toolUse)
 
         @JvmStatic
         fun ofServerToolUse(serverToolUse: BetaServerToolUseBlockParam) =
@@ -251,20 +347,57 @@ private constructor(
             BetaContentBlockParam(webSearchToolResult = webSearchToolResult)
 
         @JvmStatic
+        fun ofCodeExecutionToolResult(
+            codeExecutionToolResult: BetaCodeExecutionToolResultBlockParam
+        ) = BetaContentBlockParam(codeExecutionToolResult = codeExecutionToolResult)
+
+        @JvmStatic
+        fun ofMcpToolUse(mcpToolUse: BetaMcpToolUseBlockParam) =
+            BetaContentBlockParam(mcpToolUse = mcpToolUse)
+
+        @JvmStatic
+        fun ofMcpToolResult(mcpToolResult: BetaRequestMcpToolResultBlockParam) =
+            BetaContentBlockParam(mcpToolResult = mcpToolResult)
+
+        /** Regular text content. */
+        @JvmStatic fun ofText(text: BetaTextBlockParam) = BetaContentBlockParam(text = text)
+
+        /** Image content specified directly as base64 data or as a reference via a URL. */
+        @JvmStatic fun ofImage(image: BetaImageBlockParam) = BetaContentBlockParam(image = image)
+
+        /** A block indicating a tool use by the model. */
+        @JvmStatic
+        fun ofToolUse(toolUse: BetaToolUseBlockParam) = BetaContentBlockParam(toolUse = toolUse)
+
+        /** A block specifying the results of a tool use by the model. */
+        @JvmStatic
         fun ofToolResult(toolResult: BetaToolResultBlockParam) =
             BetaContentBlockParam(toolResult = toolResult)
 
+        /**
+         * Document content, either specified directly as base64 data, as text, or as a reference
+         * via a URL.
+         */
         @JvmStatic
-        fun ofBase64PdfBlock(base64PdfBlock: BetaBase64PdfBlock) =
-            BetaContentBlockParam(base64PdfBlock = base64PdfBlock)
+        fun ofDocument(document: BetaBase64PdfBlock) = BetaContentBlockParam(document = document)
 
+        /** A block specifying internal thinking by the model. */
         @JvmStatic
         fun ofThinking(thinking: BetaThinkingBlockParam) =
             BetaContentBlockParam(thinking = thinking)
 
+        /** A block specifying internal, redacted thinking by the model. */
         @JvmStatic
         fun ofRedactedThinking(redactedThinking: BetaRedactedThinkingBlockParam) =
             BetaContentBlockParam(redactedThinking = redactedThinking)
+
+        /**
+         * A content block that represents a file to be uploaded to the container Files uploaded via
+         * this block will be available in the container's input directory.
+         */
+        @JvmStatic
+        fun ofContainerUpload(containerUpload: BetaContainerUploadBlockParam) =
+            BetaContentBlockParam(containerUpload = containerUpload)
     }
 
     /**
@@ -273,23 +406,47 @@ private constructor(
      */
     interface Visitor<out T> {
 
-        fun visitText(text: BetaTextBlockParam): T
-
-        fun visitImage(image: BetaImageBlockParam): T
-
-        fun visitToolUse(toolUse: BetaToolUseBlockParam): T
-
         fun visitServerToolUse(serverToolUse: BetaServerToolUseBlockParam): T
 
         fun visitWebSearchToolResult(webSearchToolResult: BetaWebSearchToolResultBlockParam): T
 
+        fun visitCodeExecutionToolResult(
+            codeExecutionToolResult: BetaCodeExecutionToolResultBlockParam
+        ): T
+
+        fun visitMcpToolUse(mcpToolUse: BetaMcpToolUseBlockParam): T
+
+        fun visitMcpToolResult(mcpToolResult: BetaRequestMcpToolResultBlockParam): T
+
+        /** Regular text content. */
+        fun visitText(text: BetaTextBlockParam): T
+
+        /** Image content specified directly as base64 data or as a reference via a URL. */
+        fun visitImage(image: BetaImageBlockParam): T
+
+        /** A block indicating a tool use by the model. */
+        fun visitToolUse(toolUse: BetaToolUseBlockParam): T
+
+        /** A block specifying the results of a tool use by the model. */
         fun visitToolResult(toolResult: BetaToolResultBlockParam): T
 
-        fun visitBase64PdfBlock(base64PdfBlock: BetaBase64PdfBlock): T
+        /**
+         * Document content, either specified directly as base64 data, as text, or as a reference
+         * via a URL.
+         */
+        fun visitDocument(document: BetaBase64PdfBlock): T
 
+        /** A block specifying internal thinking by the model. */
         fun visitThinking(thinking: BetaThinkingBlockParam): T
 
+        /** A block specifying internal, redacted thinking by the model. */
         fun visitRedactedThinking(redactedThinking: BetaRedactedThinkingBlockParam): T
+
+        /**
+         * A content block that represents a file to be uploaded to the container Files uploaded via
+         * this block will be available in the container's input directory.
+         */
+        fun visitContainerUpload(containerUpload: BetaContainerUploadBlockParam): T
 
         /**
          * Maps an unknown variant of [BetaContentBlockParam] to a value of type [T].
@@ -314,6 +471,37 @@ private constructor(
             val type = json.asObject().getOrNull()?.get("type")?.asString()?.getOrNull()
 
             when (type) {
+                "server_tool_use" -> {
+                    return tryDeserialize(node, jacksonTypeRef<BetaServerToolUseBlockParam>())
+                        ?.let { BetaContentBlockParam(serverToolUse = it, _json = json) }
+                        ?: BetaContentBlockParam(_json = json)
+                }
+                "web_search_tool_result" -> {
+                    return tryDeserialize(node, jacksonTypeRef<BetaWebSearchToolResultBlockParam>())
+                        ?.let { BetaContentBlockParam(webSearchToolResult = it, _json = json) }
+                        ?: BetaContentBlockParam(_json = json)
+                }
+                "code_execution_tool_result" -> {
+                    return tryDeserialize(
+                            node,
+                            jacksonTypeRef<BetaCodeExecutionToolResultBlockParam>(),
+                        )
+                        ?.let { BetaContentBlockParam(codeExecutionToolResult = it, _json = json) }
+                        ?: BetaContentBlockParam(_json = json)
+                }
+                "mcp_tool_use" -> {
+                    return tryDeserialize(node, jacksonTypeRef<BetaMcpToolUseBlockParam>())?.let {
+                        BetaContentBlockParam(mcpToolUse = it, _json = json)
+                    } ?: BetaContentBlockParam(_json = json)
+                }
+                "mcp_tool_result" -> {
+                    return tryDeserialize(
+                            node,
+                            jacksonTypeRef<BetaRequestMcpToolResultBlockParam>(),
+                        )
+                        ?.let { BetaContentBlockParam(mcpToolResult = it, _json = json) }
+                        ?: BetaContentBlockParam(_json = json)
+                }
                 "text" -> {
                     return tryDeserialize(node, jacksonTypeRef<BetaTextBlockParam>())?.let {
                         BetaContentBlockParam(text = it, _json = json)
@@ -329,16 +517,6 @@ private constructor(
                         BetaContentBlockParam(toolUse = it, _json = json)
                     } ?: BetaContentBlockParam(_json = json)
                 }
-                "server_tool_use" -> {
-                    return tryDeserialize(node, jacksonTypeRef<BetaServerToolUseBlockParam>())
-                        ?.let { BetaContentBlockParam(serverToolUse = it, _json = json) }
-                        ?: BetaContentBlockParam(_json = json)
-                }
-                "web_search_tool_result" -> {
-                    return tryDeserialize(node, jacksonTypeRef<BetaWebSearchToolResultBlockParam>())
-                        ?.let { BetaContentBlockParam(webSearchToolResult = it, _json = json) }
-                        ?: BetaContentBlockParam(_json = json)
-                }
                 "tool_result" -> {
                     return tryDeserialize(node, jacksonTypeRef<BetaToolResultBlockParam>())?.let {
                         BetaContentBlockParam(toolResult = it, _json = json)
@@ -346,7 +524,7 @@ private constructor(
                 }
                 "document" -> {
                     return tryDeserialize(node, jacksonTypeRef<BetaBase64PdfBlock>())?.let {
-                        BetaContentBlockParam(base64PdfBlock = it, _json = json)
+                        BetaContentBlockParam(document = it, _json = json)
                     } ?: BetaContentBlockParam(_json = json)
                 }
                 "thinking" -> {
@@ -357,6 +535,11 @@ private constructor(
                 "redacted_thinking" -> {
                     return tryDeserialize(node, jacksonTypeRef<BetaRedactedThinkingBlockParam>())
                         ?.let { BetaContentBlockParam(redactedThinking = it, _json = json) }
+                        ?: BetaContentBlockParam(_json = json)
+                }
+                "container_upload" -> {
+                    return tryDeserialize(node, jacksonTypeRef<BetaContainerUploadBlockParam>())
+                        ?.let { BetaContentBlockParam(containerUpload = it, _json = json) }
                         ?: BetaContentBlockParam(_json = json)
                 }
             }
@@ -374,16 +557,21 @@ private constructor(
             provider: SerializerProvider,
         ) {
             when {
-                value.text != null -> generator.writeObject(value.text)
-                value.image != null -> generator.writeObject(value.image)
-                value.toolUse != null -> generator.writeObject(value.toolUse)
                 value.serverToolUse != null -> generator.writeObject(value.serverToolUse)
                 value.webSearchToolResult != null ->
                     generator.writeObject(value.webSearchToolResult)
+                value.codeExecutionToolResult != null ->
+                    generator.writeObject(value.codeExecutionToolResult)
+                value.mcpToolUse != null -> generator.writeObject(value.mcpToolUse)
+                value.mcpToolResult != null -> generator.writeObject(value.mcpToolResult)
+                value.text != null -> generator.writeObject(value.text)
+                value.image != null -> generator.writeObject(value.image)
+                value.toolUse != null -> generator.writeObject(value.toolUse)
                 value.toolResult != null -> generator.writeObject(value.toolResult)
-                value.base64PdfBlock != null -> generator.writeObject(value.base64PdfBlock)
+                value.document != null -> generator.writeObject(value.document)
                 value.thinking != null -> generator.writeObject(value.thinking)
                 value.redactedThinking != null -> generator.writeObject(value.redactedThinking)
+                value.containerUpload != null -> generator.writeObject(value.containerUpload)
                 value._json != null -> generator.writeObject(value._json)
                 else -> throw IllegalStateException("Invalid BetaContentBlockParam")
             }
