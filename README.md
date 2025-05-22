@@ -2,8 +2,8 @@
 
 <!-- x-release-please-start-version -->
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.anthropic/anthropic-java)](https://central.sonatype.com/artifact/com.anthropic/anthropic-java/1.4.0)
-[![javadoc](https://javadoc.io/badge2/com.anthropic/anthropic-java/1.4.0/javadoc.svg)](https://javadoc.io/doc/com.anthropic/anthropic-java/1.4.0)
+[![Maven Central](https://img.shields.io/maven-central/v/com.anthropic/anthropic-java)](https://central.sonatype.com/artifact/com.anthropic/anthropic-java/2.0.0)
+[![javadoc](https://javadoc.io/badge2/com.anthropic/anthropic-java/2.0.0/javadoc.svg)](https://javadoc.io/doc/com.anthropic/anthropic-java/2.0.0)
 
 <!-- x-release-please-end -->
 
@@ -11,7 +11,7 @@ The Anthropic Java SDK provides convenient access to the [Anthropic REST API](ht
 
 <!-- x-release-please-start-version -->
 
-The REST API documentation can be found on [docs.anthropic.com](https://docs.anthropic.com/claude/reference/). Javadocs are available on [javadoc.io](https://javadoc.io/doc/com.anthropic/anthropic-java/1.4.0).
+The REST API documentation can be found on [docs.anthropic.com](https://docs.anthropic.com/claude/reference/). Javadocs are available on [javadoc.io](https://javadoc.io/doc/com.anthropic/anthropic-java/2.0.0).
 
 <!-- x-release-please-end -->
 
@@ -22,7 +22,7 @@ The REST API documentation can be found on [docs.anthropic.com](https://docs.ant
 ### Gradle
 
 ```kotlin
-implementation("com.anthropic:anthropic-java:1.4.0")
+implementation("com.anthropic:anthropic-java:2.0.0")
 ```
 
 ### Maven
@@ -31,7 +31,7 @@ implementation("com.anthropic:anthropic-java:1.4.0")
 <dependency>
   <groupId>com.anthropic</groupId>
   <artifactId>anthropic-java</artifactId>
-  <version>1.4.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -328,6 +328,125 @@ client.messages()
 Message message = messageAccumulator.message();
 ```
 
+## File uploads
+
+The SDK defines methods that accept files, the main interface for which is exposed through [`MultipartField`](anthropic-java-core/src/main/kotlin/com/anthropic/core/Values.kt):
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+import java.nio.file.Paths;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.builder()
+        .value(Paths.get("/path/to/file.pdf"))
+        .contentType("application/pdf") // content type must be manually specified
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Or an arbitrary [`InputStream`](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html):
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+import java.io.InputStream;
+import java.net.URL;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.<InputStream>builder()
+        .value(new URL("https://example.com/path/to/file").openStream())
+        .filename("document.pdf")
+        .contentType("application/pdf")
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Or a `byte[]` array:
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.<byte[]>builder()
+        .value("content".getBytes())
+        .filename("document.txt")
+        .contentType("text/plain")
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Note that you can also pass certain values directly, however this is not recommended as the
+files API will not infer the correct content-type for you.
+
+```java
+FileUploadParams params = FileUploadParams.builder()
+    .file(Paths.get("/path/to/file"))
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+```
+
+## Binary responses
+
+The SDK defines methods that return binary responses, which are used for API responses that shouldn't necessarily be parsed, like non-JSON data.
+
+These methods return [`HttpResponse`](anthropic-java-core/src/main/kotlin/com/anthropic/core/http/HttpResponse.kt):
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import com.anthropic.models.beta.files.FileDownloadParams;
+
+HttpResponse response = client.beta().files().download("file_id");
+```
+
+To save the response content to a file, use the [`Files.copy(...)`](https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#copy-java.io.InputStream-java.nio.file.Path-java.nio.file.CopyOption...-) method:
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+try (HttpResponse response = client.beta().files().download(params)) {
+    Files.copy(
+        response.body(),
+        Paths.get(path),
+        StandardCopyOption.REPLACE_EXISTING
+    );
+} catch (Exception e) {
+    System.out.println("Something went wrong!");
+    throw new RuntimeException(e);
+}
+```
+
+Or transfer the response content to any [`OutputStream`](https://docs.oracle.com/javase/8/docs/api/java/io/OutputStream.html):
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+try (HttpResponse response = client.beta().files().download(params)) {
+    response.body().transferTo(Files.newOutputStream(Paths.get(path)));
+} catch (Exception e) {
+    System.out.println("Something went wrong!");
+    throw new RuntimeException(e);
+}
+```
+
 ## Raw responses
 
 The SDK defines methods that deserialize responses into instances of Java classes. However, these methods don't provide access to the response headers, status code, or the raw response body.
@@ -404,53 +523,101 @@ The SDK throws custom unchecked exception types:
 
 ## Pagination
 
-For methods that return a paginated list of results, this library provides convenient ways access the results either one page at a time, or item-by-item across all pages.
+The SDK defines methods that return a paginated lists of results. It provides convenient ways to access the results either one page at a time or item-by-item across all pages.
 
 ### Auto-pagination
 
-To iterate through all results across all pages, you can use `autoPager`, which automatically handles fetching more pages for you:
+To iterate through all results across all pages, use the `autoPager()` method, which automatically fetches more pages as needed.
 
-### Synchronous
+When using the synchronous client, the method returns an [`Iterable`](https://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html)
 
 ```java
 import com.anthropic.models.beta.messages.batches.BatchListPage;
 import com.anthropic.models.beta.messages.batches.BetaMessageBatch;
 
-// As an Iterable:
-BatchListPage page = client.beta().messages().batches().list(params);
+BatchListPage page = client.beta().messages().batches().list();
+
+// Process as an Iterable
 for (BetaMessageBatch batch : page.autoPager()) {
     System.out.println(batch);
-};
+}
 
-// As a Stream:
-client.beta().messages().batches().list(params).autoPager().stream()
+// Process as a Stream
+page.autoPager()
+    .stream()
     .limit(50)
     .forEach(batch -> System.out.println(batch));
 ```
 
-### Asynchronous
+When using the asynchronous client, the method returns an [`AsyncStreamResponse`](anthropic-java-core/src/main/kotlin/com/anthropic/core/http/AsyncStreamResponse.kt):
 
 ```java
-// Using forEach, which returns CompletableFuture<Void>:
-asyncClient.beta().messages().batches().list(params).autoPager()
-    .forEach(batch -> System.out.println(batch), executor);
+import com.anthropic.core.http.AsyncStreamResponse;
+import com.anthropic.models.beta.messages.batches.BatchListPageAsync;
+import com.anthropic.models.beta.messages.batches.BetaMessageBatch;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+CompletableFuture<BatchListPageAsync> pageFuture = client.async().beta().messages().batches().list();
+
+pageFuture.thenRun(page -> page.autoPager().subscribe(batch -> {
+    System.out.println(batch);
+}));
+
+// If you need to handle errors or completion of the stream
+pageFuture.thenRun(page -> page.autoPager().subscribe(new AsyncStreamResponse.Handler<>() {
+    @Override
+    public void onNext(BetaMessageBatch batch) {
+        System.out.println(batch);
+    }
+
+    @Override
+    public void onComplete(Optional<Throwable> error) {
+        if (error.isPresent()) {
+            System.out.println("Something went wrong!");
+            throw new RuntimeException(error.get());
+        } else {
+            System.out.println("No more!");
+        }
+    }
+}));
+
+// Or use futures
+pageFuture.thenRun(page -> page.autoPager()
+    .subscribe(batch -> {
+        System.out.println(batch);
+    })
+    .onCompleteFuture()
+    .whenComplete((unused, error) -> {
+        if (error != null) {
+            System.out.println("Something went wrong!");
+            throw new RuntimeException(error);
+        } else {
+            System.out.println("No more!");
+        }
+    }));
 ```
 
 ### Manual pagination
 
-If none of the above helpers meet your needs, you can also manually request pages one-by-one. A page of results has a `data()` method to fetch the list of objects, as well as top-level `response` and other methods to fetch top-level data about the page. It also has methods `hasNextPage`, `getNextPage`, and `getNextPageParams` methods to help with pagination.
+To access individual page items and manually request the next page, use the `items()`,
+`hasNextPage()`, and `nextPage()` methods:
 
 ```java
 import com.anthropic.models.beta.messages.batches.BatchListPage;
 import com.anthropic.models.beta.messages.batches.BetaMessageBatch;
 
-BatchListPage page = client.beta().messages().batches().list(params);
-while (page != null) {
-    for (BetaMessageBatch batch : page.data()) {
+BatchListPage page = client.beta().messages().batches().list();
+while (true) {
+    for (BetaMessageBatch batch : page.items()) {
         System.out.println(batch);
     }
 
-    page = page.getNextPage().orElse(null);
+    if (!page.hasNextPage()) {
+        break;
+    }
+
+    page = page.nextPage();
 }
 ```
 
@@ -465,7 +632,7 @@ requires the `anthropic-java-bedrock` library dependency.
 ### Gradle
 
 ```kotlin
-implementation("com.anthropic:anthropic-java-bedrock:1.4.0")
+implementation("com.anthropic:anthropic-java-bedrock:2.0.0")
 ```
 
 ### Maven
@@ -474,7 +641,7 @@ implementation("com.anthropic:anthropic-java-bedrock:1.4.0")
 <dependency>
     <groupId>com.anthropic</groupId>
     <artifactId>anthropic-java-bedrock</artifactId>
-    <version>1.4.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -572,7 +739,7 @@ This support requires the `anthropic-java-vertex` library dependency.
 ### Gradle
 
 ```kotlin
-implementation("com.anthropic:anthropic-java-vertex:1.4.0")
+implementation("com.anthropic:anthropic-java-vertex:2.0.0")
 ```
 
 ### Maven
@@ -581,7 +748,7 @@ implementation("com.anthropic:anthropic-java-vertex:1.4.0")
 <dependency>
     <groupId>com.anthropic</groupId>
     <artifactId>anthropic-java-vertex</artifactId>
-    <version>1.4.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -725,8 +892,6 @@ To set a custom timeout, configure the method call using the `timeout` method:
 
 ```java
 import com.anthropic.models.messages.Message;
-import com.anthropic.models.messages.MessageCreateParams;
-import com.anthropic.models.messages.Model;
 
 Message message = client.messages().create(
   params, RequestOptions.builder().timeout(Duration.ofSeconds(30)).build()
@@ -822,6 +987,11 @@ MessageCreateParams params = MessageCreateParams.builder()
 ```
 
 These can be accessed on the built object later using the `_additionalHeaders()`, `_additionalQueryParams()`, and `_additionalBodyProperties()` methods.
+
+> [!WARNING]
+> The values passed to these methods overwrite values passed to earlier methods.
+>
+> For security reasons, ensure these methods are only used with trusted input data.
 
 To set undocumented parameters on _nested_ headers, query params, or body classes, call the `putAdditionalProperty` method on the nested class:
 
@@ -980,8 +1150,6 @@ Or configure the method call to validate the response using the `responseValidat
 
 ```java
 import com.anthropic.models.messages.Message;
-import com.anthropic.models.messages.MessageCreateParams;
-import com.anthropic.models.messages.Model;
 
 Message message = client.messages().create(
   params, RequestOptions.builder().responseValidation(true).build()
