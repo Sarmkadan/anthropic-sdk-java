@@ -328,6 +328,125 @@ client.messages()
 Message message = messageAccumulator.message();
 ```
 
+## File uploads
+
+The SDK defines methods that accept files, the main interface for which is exposed through [`MultipartField`](anthropic-java-core/src/main/kotlin/com/anthropic/core/Values.kt):
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+import java.nio.file.Paths;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.builder()
+        .value(Paths.get("/path/to/file.pdf"))
+        .contentType("application/pdf") // content type must be manually specified
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Or an arbitrary [`InputStream`](https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html):
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+import java.io.InputStream;
+import java.net.URL;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.<InputStream>builder()
+        .value(new URL("https://example.com/path/to/file").openStream())
+        .filename("document.pdf")
+        .contentType("application/pdf")
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Or a `byte[]` array:
+
+```java
+import com.anthropic.core.MultipartField;
+import com.anthropic.models.beta.files.FileMetadata;
+import com.anthropic.models.beta.files.FileUploadParams;
+import com.anthropic.models.beta.AnthropicBeta;
+
+FileUploadParams params = FileUploadParams.builder()
+    .file(MultipartField.<byte[]>builder()
+        .value("content".getBytes())
+        .filename("document.txt")
+        .contentType("text/plain")
+        .build())
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+FileMetadata fileMetadata = client.beta().files().upload(params);
+```
+
+Note that you can also pass certain values directly, however this is not recommended as the
+files API will not infer the correct content-type for you.
+
+```java
+FileUploadParams params = FileUploadParams.builder()
+    .file(Paths.get("/path/to/file"))
+    .addBeta(AnthropicBeta.FILES_API_2025_04_14)
+    .build();
+```
+
+## Binary responses
+
+The SDK defines methods that return binary responses, which are used for API responses that shouldn't necessarily be parsed, like non-JSON data.
+
+These methods return [`HttpResponse`](anthropic-java-core/src/main/kotlin/com/anthropic/core/http/HttpResponse.kt):
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import com.anthropic.models.beta.files.FileDownloadParams;
+
+HttpResponse response = client.beta().files().download("file_id");
+```
+
+To save the response content to a file, use the [`Files.copy(...)`](https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#copy-java.io.InputStream-java.nio.file.Path-java.nio.file.CopyOption...-) method:
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+try (HttpResponse response = client.beta().files().download(params)) {
+    Files.copy(
+        response.body(),
+        Paths.get(path),
+        StandardCopyOption.REPLACE_EXISTING
+    );
+} catch (Exception e) {
+    System.out.println("Something went wrong!");
+    throw new RuntimeException(e);
+}
+```
+
+Or transfer the response content to any [`OutputStream`](https://docs.oracle.com/javase/8/docs/api/java/io/OutputStream.html):
+
+```java
+import com.anthropic.core.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+try (HttpResponse response = client.beta().files().download(params)) {
+    response.body().transferTo(Files.newOutputStream(Paths.get(path)));
+} catch (Exception e) {
+    System.out.println("Something went wrong!");
+    throw new RuntimeException(e);
+}
+```
+
 ## Raw responses
 
 The SDK defines methods that deserialize responses into instances of Java classes. However, these methods don't provide access to the response headers, status code, or the raw response body.

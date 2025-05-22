@@ -23,7 +23,6 @@ import com.anthropic.core.http.toAsync
 import com.anthropic.core.prepareAsync
 import com.anthropic.models.completions.Completion
 import com.anthropic.models.completions.CompletionCreateParams
-import java.time.Duration
 import java.util.concurrent.CompletableFuture
 
 class CompletionServiceAsyncImpl internal constructor(private val clientOptions: ClientOptions) :
@@ -74,7 +73,11 @@ class CompletionServiceAsyncImpl internal constructor(private val clientOptions:
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaults(RequestOptions.builder().timeout(Duration.ofMinutes(10)).build())
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokensToSample(),
+                        isStreaming = false,
+                        model = params.model().toString(),
+                    )
             return request
                 .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
                 .thenApply { response ->
@@ -118,7 +121,11 @@ class CompletionServiceAsyncImpl internal constructor(private val clientOptions:
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaults(RequestOptions.builder().timeout(Duration.ofMinutes(10)).build())
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokensToSample(),
+                        isStreaming = true,
+                        model = params.model().toString(),
+                    )
             return request
                 .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
                 .thenApply { response ->

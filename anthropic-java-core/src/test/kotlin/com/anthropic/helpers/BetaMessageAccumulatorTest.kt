@@ -772,6 +772,12 @@ internal class BetaMessageAccumulatorTest {
                         // one or more later `message_delta` events.
                         .stopReason(NOT_SET)
                         .stopSequence(NOT_SET)
+                        .container(
+                            BetaContainer.builder()
+                                .id("container-id")
+                                .expiresAt(java.time.OffsetDateTime.now().plusDays(1))
+                                .build()
+                        )
                         // The default non-null value for `role` suffices.
                         .build()
                 )
@@ -812,6 +818,12 @@ internal class BetaMessageAccumulatorTest {
             BetaRawMessageDeltaEvent.builder()
                 .delta(
                     BetaRawMessageDeltaEvent.Delta.builder()
+                        .container(
+                            BetaContainer.builder()
+                                .id("container-id")
+                                .expiresAt(java.time.OffsetDateTime.now().plusDays(1))
+                                .build()
+                        )
                         .stopReason(stopReason)
                         .stopSequence(stopSequence)
                         .build()
@@ -958,10 +970,17 @@ internal class BetaMessageAccumulatorTest {
     private fun usage(inputTokens: Long) =
         BetaUsage.builder()
             .inputTokens(inputTokens)
+            .cacheCreation(
+                BetaCacheCreation.builder()
+                    .ephemeral1hInputTokens(0L)
+                    .ephemeral5mInputTokens(0L)
+                    .build()
+            )
             .cacheCreationInputTokens(0L)
             .cacheReadInputTokens(0L)
             .outputTokens(0L)
             .serverToolUse(BetaServerToolUsage.builder().webSearchRequests(0L).build())
+            .serviceTier(BetaUsage.ServiceTier.STANDARD)
             .build()
 
     private fun textDelta(text: String) = BetaTextDelta.builder().text(text).build()

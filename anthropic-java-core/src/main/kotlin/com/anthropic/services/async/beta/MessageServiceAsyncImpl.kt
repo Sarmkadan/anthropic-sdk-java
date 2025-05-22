@@ -96,7 +96,11 @@ class MessageServiceAsyncImpl internal constructor(private val clientOptions: Cl
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaultTimeoutFromMaxTokens(params.maxTokens(), isStreaming = false)
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokens(),
+                        isStreaming = false,
+                        model = params.model().toString(),
+                    )
             return request
                 .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
                 .thenApply { response ->
@@ -141,7 +145,11 @@ class MessageServiceAsyncImpl internal constructor(private val clientOptions: Cl
             val requestOptions =
                 requestOptions
                     .applyDefaults(RequestOptions.from(clientOptions))
-                    .applyDefaultTimeoutFromMaxTokens(params.maxTokens(), isStreaming = true)
+                    .applyDefaultTimeoutFromMaxTokens(
+                        params.maxTokens(),
+                        isStreaming = true,
+                        model = params.model().toString(),
+                    )
             return request
                 .thenComposeAsync { clientOptions.httpClient.executeAsync(it, requestOptions) }
                 .thenApply { response ->
