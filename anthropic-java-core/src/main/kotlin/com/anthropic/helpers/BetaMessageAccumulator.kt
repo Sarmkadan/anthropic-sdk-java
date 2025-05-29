@@ -5,6 +5,14 @@ import com.anthropic.core.jsonMapper
 import com.anthropic.errors.AnthropicInvalidDataException
 import com.anthropic.models.beta.messages.*
 
+/** Types of content blocks that track tool input via input_json_delta events */
+typealias BetaTracksToolInput = BetaContentBlock
+
+/** Checks if a content block is one that tracks tool input via input_json_delta events */
+internal fun BetaContentBlock.tracksToolInput(): Boolean {
+    return isToolUse() || isServerToolUse() || isMcpToolUse()
+}
+
 /**
  * An accumulator that constructs a [BetaMessage] from a sequence of streamed events. Pass all
  * events from the `message_start` event to the `message_stop` event to [accumulate] and then call
@@ -398,7 +406,7 @@ class BetaMessageAccumulator private constructor() {
                     // to update the final `tool_use` content block.
                     val inputJson = messageContentInputJson[index]
 
-                    if (oldContentBlock.isToolUse()) {
+                    if (oldContentBlock.tracksToolInput()) {
                         // Check that there was at least one delta, so a potentially-valid `input`
                         // JSON string was accumulated.
                         inputJson
@@ -406,36 +414,46 @@ class BetaMessageAccumulator private constructor() {
                                 "Missing input JSON for index $index."
                             )
 
-                        messageContent[index] =
-                            BetaContentBlock.ofToolUse(
-                                oldContentBlock
-                                    .asToolUse()
-                                    .toBuilder()
-                                    // Anthropic Streaming Messages API: "the final `tool_use.input`
-                                    // is always an _object_."
-                                    .input(JSON_MAPPER.readValue(inputJson, JsonObject::class.java))
-                                    .build()
-                            )
-                    }
-
-                    if (oldContentBlock.isMcpToolUse()) {
-                        // Check that there was at least one delta, so a potentially-valid `input`
-                        // JSON string was accumulated.
-                        inputJson
-                            ?: throw AnthropicInvalidDataException(
-                                "Missing input JSON for index $index."
-                            )
+                        val parsedInput = JSON_MAPPER.readValue(inputJson, JsonObject::class.java)
 
                         messageContent[index] =
-                            BetaContentBlock.ofMcpToolUse(
-                                oldContentBlock
-                                    .asMcpToolUse()
-                                    .toBuilder()
-                                    // Anthropic Streaming Messages API: "the final `tool_use.input`
-                                    // is always an _object_."
-                                    .input(JSON_MAPPER.readValue(inputJson, JsonObject::class.java))
-                                    .build()
-                            )
+                            when {
+                                oldContentBlock.isToolUse() ->
+                                    BetaContentBlock.ofToolUse(
+                                        oldContentBlock
+                                            .asToolUse()
+                                            .toBuilder()
+                                            // Anthropic Streaming Messages API: "the final
+                                            // `tool_use.input`
+                                            // is always an _object_."
+                                            .input(parsedInput)
+                                            .build()
+                                    )
+                                oldContentBlock.isServerToolUse() ->
+                                    BetaContentBlock.ofServerToolUse(
+                                        oldContentBlock
+                                            .asServerToolUse()
+                                            .toBuilder()
+                                            // Anthropic Streaming Messages API: "the final
+                                            // `server_tool_use.input`
+                                            // is always an _object_."
+                                            .input(parsedInput)
+                                            .build()
+                                    )
+                                oldContentBlock.isMcpToolUse() ->
+                                    BetaContentBlock.ofMcpToolUse(
+                                        oldContentBlock
+                                            .asMcpToolUse()
+                                            .toBuilder()
+                                            // Anthropic Streaming Messages API: "the final
+                                            // `mcp_tool_use.input`
+                                            // is always an _object_."
+                                            .input(parsedInput)
+                                            .build()
+                                    )
+                                else -> oldContentBlock // Should never happen given tracksToolInput
+                            // check
+                            }
                     }
                 }
             }
