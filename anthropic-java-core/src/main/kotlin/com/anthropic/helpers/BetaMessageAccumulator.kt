@@ -9,9 +9,9 @@ import com.anthropic.models.beta.messages.*
 typealias BetaTracksToolInput = BetaContentBlock
 
 /** Checks if a content block is one that tracks tool input via input_json_delta events */
-internal fun BetaContentBlock.tracksToolInput(): Boolean {
-    return isToolUse() || isServerToolUse() || isMcpToolUse()
-}
+@JvmSynthetic
+internal fun BetaContentBlock.tracksToolInput(): Boolean =
+    isToolUse() || isServerToolUse() || isMcpToolUse()
 
 /**
  * An accumulator that constructs a [BetaMessage] from a sequence of streamed events. Pass all
