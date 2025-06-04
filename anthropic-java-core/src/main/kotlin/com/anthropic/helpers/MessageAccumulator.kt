@@ -37,9 +37,9 @@ import com.anthropic.models.messages.WebSearchToolResultBlock
 typealias TracksToolInput = ContentBlock
 
 /** Checks if a content block is one that tracks tool input via input_json_delta events */
-internal fun ContentBlock.tracksToolInput(): Boolean {
-    return isToolUse() || isServerToolUse()
-}
+@JvmSynthetic
+internal fun ContentBlock.tracksToolInput(): Boolean =
+    isToolUse() || isServerToolUse()
 
 /**
  * An accumulator that constructs a [Message] from a sequence of streamed events. Pass all events
