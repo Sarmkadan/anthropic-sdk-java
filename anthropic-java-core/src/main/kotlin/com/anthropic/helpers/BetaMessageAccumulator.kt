@@ -5,9 +5,6 @@ import com.anthropic.core.jsonMapper
 import com.anthropic.errors.AnthropicInvalidDataException
 import com.anthropic.models.beta.messages.*
 
-/** Types of content blocks that track tool input via input_json_delta events */
-typealias BetaTracksToolInput = BetaContentBlock
-
 /** Checks if a content block is one that tracks tool input via input_json_delta events */
 @JvmSynthetic
 internal fun BetaContentBlock.tracksToolInput(): Boolean =
@@ -423,9 +420,6 @@ class BetaMessageAccumulator private constructor() {
                                         oldContentBlock
                                             .asToolUse()
                                             .toBuilder()
-                                            // Anthropic Streaming Messages API: "the final
-                                            // `tool_use.input`
-                                            // is always an _object_."
                                             .input(parsedInput)
                                             .build()
                                     )
@@ -434,9 +428,6 @@ class BetaMessageAccumulator private constructor() {
                                         oldContentBlock
                                             .asServerToolUse()
                                             .toBuilder()
-                                            // Anthropic Streaming Messages API: "the final
-                                            // `server_tool_use.input`
-                                            // is always an _object_."
                                             .input(parsedInput)
                                             .build()
                                     )
@@ -445,9 +436,6 @@ class BetaMessageAccumulator private constructor() {
                                         oldContentBlock
                                             .asMcpToolUse()
                                             .toBuilder()
-                                            // Anthropic Streaming Messages API: "the final
-                                            // `mcp_tool_use.input`
-                                            // is always an _object_."
                                             .input(parsedInput)
                                             .build()
                                     )
