@@ -1791,6 +1791,13 @@ private constructor(
 
                 /**
                  * Alias for calling [addTool] with
+                 * `ToolUnion.ofTextEditor20250429(textEditor20250429)`.
+                 */
+                fun addTool(textEditor20250429: ToolUnion.TextEditor20250429) =
+                    addTool(ToolUnion.ofTextEditor20250429(textEditor20250429))
+
+                /**
+                 * Alias for calling [addTool] with
                  * `ToolUnion.ofWebSearchTool20250305(webSearchTool20250305)`.
                  */
                 fun addTool(webSearchTool20250305: WebSearchTool20250305) =
