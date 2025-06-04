@@ -33,13 +33,9 @@ import com.anthropic.models.messages.ToolUseBlock
 import com.anthropic.models.messages.Usage
 import com.anthropic.models.messages.WebSearchToolResultBlock
 
-/** Types of content blocks that track tool input via input_json_delta events */
-typealias TracksToolInput = ContentBlock
-
 /** Checks if a content block is one that tracks tool input via input_json_delta events */
 @JvmSynthetic
-internal fun ContentBlock.tracksToolInput(): Boolean =
-    isToolUse() || isServerToolUse()
+internal fun ContentBlock.tracksToolInput(): Boolean = isToolUse() || isServerToolUse()
 
 /**
  * An accumulator that constructs a [Message] from a sequence of streamed events. Pass all events
@@ -408,12 +404,10 @@ class MessageAccumulator private constructor() {
                                             .asToolUse()
                                             .toBuilder()
                                             // Anthropic Streaming Messages API: "the final
-                                            // `tool_use.input`
-                                            // is always an _object_." However, if a tool function
-                                            // has no
-                                            // arguments, the concatenated `inputJson` can be an
-                                            // empty
-                                            // string. In that case, interpret it as a missing
+                                            // `tool_use.input` is always an _object_."
+                                            // However, if a tool function has no arguments, the
+                                            // concatenated `inputJson` can be an
+                                            // empty string. In that case, interpret it as a missing
                                             // field.
                                             .input(parsedInput)
                                             .build()
@@ -423,14 +417,7 @@ class MessageAccumulator private constructor() {
                                         oldContentBlock
                                             .asServerToolUse()
                                             .toBuilder()
-                                            // Anthropic Streaming Messages API: "the final
-                                            // `server_tool_use.input`
-                                            // is always an _object_." However, if a tool function
-                                            // has no
-                                            // arguments, the concatenated `inputJson` can be an
-                                            // empty
-                                            // string. In that case, interpret it as a missing
-                                            // field.
+                                            // See note above about empty `inputJson`.
                                             .input(parsedInput)
                                             .build()
                                     )
