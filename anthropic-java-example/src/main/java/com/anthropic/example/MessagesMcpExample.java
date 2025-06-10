@@ -35,6 +35,7 @@ public final class MessagesMcpExample {
                 .maxTokens(1000)
                 .mcpServers(List.of(mcpServer))
                 .addUserMessage("Calculate 1+2")
+                .putAdditionalHeader("anthropic-beta", "mcp-client-2025-04-04")
                 .build();
 
         try (StreamResponse<BetaRawMessageStreamEvent> streamResponse =
