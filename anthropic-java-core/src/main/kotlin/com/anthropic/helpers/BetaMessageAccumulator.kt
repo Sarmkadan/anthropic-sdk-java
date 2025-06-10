@@ -411,7 +411,14 @@ class BetaMessageAccumulator private constructor() {
                                 "Missing input JSON for index $index."
                             )
 
-                        val parsedInput = JSON_MAPPER.readValue(inputJson, JsonObject::class.java)
+                        val parsedInput =
+                            try {
+                                JSON_MAPPER.readValue(inputJson, JsonObject::class.java)
+                            } catch (e: Exception) {
+                                throw AnthropicInvalidDataException(
+                                    "Unable to parse tool parameter JSON from model. Please retry your request or adjust your prompt. Error: ${e}. JSON: $inputJson"
+                                )
+                            }
 
                         messageContent[index] =
                             when {
