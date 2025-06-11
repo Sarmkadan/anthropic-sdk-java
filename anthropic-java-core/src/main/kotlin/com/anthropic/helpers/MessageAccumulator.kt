@@ -33,6 +33,10 @@ import com.anthropic.models.messages.ToolUseBlock
 import com.anthropic.models.messages.Usage
 import com.anthropic.models.messages.WebSearchToolResultBlock
 
+/** Checks if a content block is one that tracks tool input via input_json_delta events */
+@JvmSynthetic
+internal fun ContentBlock.tracksToolInput(): Boolean = isToolUse() || isServerToolUse()
+
 /**
  * An accumulator that constructs a [Message] from a sequence of streamed events. Pass all events
  * from the `message_start` event to the `message_stop` event to [accumulate] and then call
@@ -380,7 +384,7 @@ class MessageAccumulator private constructor() {
                     // to update the final `tool_use` content block.
                     val inputJson = messageContentInputJson[index]
 
-                    if (oldContentBlock.isToolUse()) {
+                    if (oldContentBlock.tracksToolInput()) {
                         // Check that there was at least one delta, so a potentially-valid `input`
                         // JSON string was accumulated.
                         inputJson
@@ -388,22 +392,38 @@ class MessageAccumulator private constructor() {
                                 "Missing input JSON for index $index."
                             )
 
+                        val parsedInput =
+                            if (inputJson.trim() == "") JsonMissing.of()
+                            else JSON_MAPPER.readValue(inputJson, JsonObject::class.java)
+
                         messageContent[index] =
-                            ContentBlock.ofToolUse(
-                                oldContentBlock
-                                    .asToolUse()
-                                    .toBuilder()
-                                    // Anthropic Streaming Messages API: "the final `tool_use.input`
-                                    // is always an _object_." However, if a tool function has no
-                                    // arguments, the concatenated `inputJson` can be an empty
-                                    // string. In that case, interpret it as a missing field.
-                                    .input(
-                                        if (inputJson.trim() == "") JsonMissing.of()
-                                        else
-                                            JSON_MAPPER.readValue(inputJson, JsonObject::class.java)
+                            when {
+                                oldContentBlock.isToolUse() ->
+                                    ContentBlock.ofToolUse(
+                                        oldContentBlock
+                                            .asToolUse()
+                                            .toBuilder()
+                                            // Anthropic Streaming Messages API: "the final
+                                            // `tool_use.input` is always an _object_."
+                                            // However, if a tool function has no arguments, the
+                                            // concatenated `inputJson` can be an
+                                            // empty string. In that case, interpret it as a missing
+                                            // field.
+                                            .input(parsedInput)
+                                            .build()
                                     )
-                                    .build()
-                            )
+                                oldContentBlock.isServerToolUse() ->
+                                    ContentBlock.ofServerToolUse(
+                                        oldContentBlock
+                                            .asServerToolUse()
+                                            .toBuilder()
+                                            // See note above about empty `inputJson`.
+                                            .input(parsedInput)
+                                            .build()
+                                    )
+                                else -> oldContentBlock // Should never happen given tracksToolInput
+                            // check
+                            }
                     }
                 }
             }
