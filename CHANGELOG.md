@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.1.0 (2025-06-11)
+
+Full Changelog: [v2.0.0...v2.1.0](https://github.com/anthropics/anthropic-sdk-java/compare/v2.0.0...v2.1.0)
+
+### Features
+
+* **api:** api update ([823032b](https://github.com/anthropics/anthropic-sdk-java/commit/823032be6cb8d06ad6a106b78672f7df0f0fdb37))
+* **api:** manual updates ([6156bcb](https://github.com/anthropics/anthropic-sdk-java/commit/6156bcb1d6d21041b6e34d8bab9f5e75e7a085fa))
+* **client:** add support for fine-grained-tool-streaming-2025-05-14 ([37aa2a1](https://github.com/anthropics/anthropic-sdk-java/commit/37aa2a1d82cddde6ff7f1b3e38085bf658971e1d))
+* **client:** add support for new text_editor_20250429 tool ([f85d1a2](https://github.com/anthropics/anthropic-sdk-java/commit/f85d1a233b58b7c926dddb64131de7122716d169))
+* **client:** more `toParam()` methods ([151e181](https://github.com/anthropics/anthropic-sdk-java/commit/151e181c1521dab983e9fb03a9bfb2430dca88f9))
+
+
+### Bug Fixes
+
+* **client:** `toParam` methods ([2632693](https://github.com/anthropics/anthropic-sdk-java/commit/26326938e574f4265c3c940fa5a85a143ee75f7f))
+* **client:** deprecate BetaBase64PDFBlock in favor of BetaRequestDocumentBlock ([e83424b](https://github.com/anthropics/anthropic-sdk-java/commit/e83424bb384c33f677cccd2174d779d344cfe916))
+* **client:** handle server tool use delta and extract to better type ([3d2f428](https://github.com/anthropics/anthropic-sdk-java/commit/3d2f4289a8195a9c9faf97ef48904aa769383157))
+* **client:** remove `@MustBeClosed` for future returning methods ([b9b63ca](https://github.com/anthropics/anthropic-sdk-java/commit/b9b63ca942178bc390a1c8a95deea4817edb9b60))
+
+
+### Chores
+
+* **docs:** adjust MCP example to show use of beta header ([7d1758a](https://github.com/anthropics/anthropic-sdk-java/commit/7d1758a00b49c9fbe7ccbf2cc1bc294e1257a58a))
+* **internal:** fix release workflows ([a5287dc](https://github.com/anthropics/anthropic-sdk-java/commit/a5287dc4ffaad0e02fed166b63e4635448666247))
+* **tests:** add test for fine-grained-tool-streaming-2025-05-14 logic ([2b39131](https://github.com/anthropics/anthropic-sdk-java/commit/2b391311176cc7fbdc4325ee5777818014d10ca1))
+
 ## 2.0.0 (2025-05-22)
 
 Full Changelog: [v1.4.0...v2.0.0](https://github.com/anthropics/anthropic-sdk-java/compare/v1.4.0...v2.0.0)
