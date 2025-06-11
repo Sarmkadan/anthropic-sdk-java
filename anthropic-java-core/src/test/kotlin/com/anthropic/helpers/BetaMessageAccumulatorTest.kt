@@ -610,6 +610,24 @@ internal class BetaMessageAccumulatorTest {
     }
 
     @Test
+    fun accumulateToolUseContentBlockWithInvalidJson() {
+        val accumulator = BetaMessageAccumulator.create()
+
+        accumulator.accumulate(messageStartEvent())
+        accumulator.accumulate(toolUseContentBlockStartEvent(1L, "test-tool"))
+
+        // Build up invalid JSON string: {invalid"json}
+        accumulator.accumulate(toolUseContentBlockDeltaEvent(1L, "{invalid\""))
+        accumulator.accumulate(toolUseContentBlockDeltaEvent(1L, "json}"))
+
+        // Should throw AnthropicInvalidDataException when trying to parse invalid JSON
+        assertThatThrownBy { accumulator.accumulate(contentBlockStopEvent(1L)) }
+            .isInstanceOf(AnthropicInvalidDataException::class.java)
+            .hasMessageContaining("Unable to parse tool parameter JSON from model")
+            .hasMessageContaining("JSON: {invalid\"json}")
+    }
+
+    @Test
     fun accumulateThinkingAndTextContentBlocks() {
         val accumulator = BetaMessageAccumulator.create()
 
