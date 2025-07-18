@@ -17,6 +17,9 @@ import java.time.Clock
 import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.Executor
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.X509TrustManager
 import kotlin.jvm.optionals.getOrNull
 
 class AnthropicOkHttpClient private constructor() {
@@ -34,10 +37,64 @@ class AnthropicOkHttpClient private constructor() {
 
         private var clientOptions: ClientOptions.Builder = ClientOptions.builder()
         private var proxy: Proxy? = null
+        private var sslSocketFactory: SSLSocketFactory? = null
+        private var trustManager: X509TrustManager? = null
+        private var hostnameVerifier: HostnameVerifier? = null
         private var backend: Backend? = null
         private var defaultBackendBuilder: AnthropicBackend.Builder? = null
 
-        fun proxy(proxy: Proxy) = apply { this.proxy = proxy }
+        fun proxy(proxy: Proxy?) = apply { this.proxy = proxy }
+
+        /** Alias for calling [Builder.proxy] with `proxy.orElse(null)`. */
+        fun proxy(proxy: Optional<Proxy>) = proxy(proxy.getOrNull())
+
+        /**
+         * The socket factory used to secure HTTPS connections.
+         *
+         * If this is set, then [trustManager] must also be set.
+         *
+         * If unset, then the system default is used. Most applications should not call this method,
+         * and instead use the system default. The default include special optimizations that can be
+         * lost if the implementation is modified.
+         */
+        fun sslSocketFactory(sslSocketFactory: SSLSocketFactory?) = apply {
+            this.sslSocketFactory = sslSocketFactory
+        }
+
+        /** Alias for calling [Builder.sslSocketFactory] with `sslSocketFactory.orElse(null)`. */
+        fun sslSocketFactory(sslSocketFactory: Optional<SSLSocketFactory>) =
+            sslSocketFactory(sslSocketFactory.getOrNull())
+
+        /**
+         * The trust manager used to secure HTTPS connections.
+         *
+         * If this is set, then [sslSocketFactory] must also be set.
+         *
+         * If unset, then the system default is used. Most applications should not call this method,
+         * and instead use the system default. The default include special optimizations that can be
+         * lost if the implementation is modified.
+         */
+        fun trustManager(trustManager: X509TrustManager?) = apply {
+            this.trustManager = trustManager
+        }
+
+        /** Alias for calling [Builder.trustManager] with `trustManager.orElse(null)`. */
+        fun trustManager(trustManager: Optional<X509TrustManager>) =
+            trustManager(trustManager.getOrNull())
+
+        /**
+         * The verifier used to confirm that response certificates apply to requested hostnames for
+         * HTTPS connections.
+         *
+         * If unset, then a default hostname verifier is used.
+         */
+        fun hostnameVerifier(hostnameVerifier: HostnameVerifier?) = apply {
+            this.hostnameVerifier = hostnameVerifier
+        }
+
+        /** Alias for calling [Builder.hostnameVerifier] with `hostnameVerifier.orElse(null)`. */
+        fun hostnameVerifier(hostnameVerifier: Optional<HostnameVerifier>) =
+            hostnameVerifier(hostnameVerifier.getOrNull())
         
         fun baseUrl(baseUrl: String) = apply {
             ensureDefaultBackendBuilder("baseUrl").baseUrl(baseUrl)
@@ -237,9 +294,12 @@ class AnthropicOkHttpClient private constructor() {
             AnthropicClientImpl(
                 clientOptions
                     .httpClient(
-                        OkHttpClient.builder()
-                            .timeout(timeout)
+                        OkHttpClient.builder()                      
+                            .timeout(clientOptions.timeout())
                             .proxy(proxy)
+                            .sslSocketFactory(sslSocketFactory)
+                            .trustManager(trustManager)
+                            .hostnameVerifier(hostnameVerifier)
                             .backend(ensureBackend())
                             .build()
                     )
