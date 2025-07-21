@@ -95,7 +95,7 @@ class AnthropicOkHttpClient private constructor() {
         /** Alias for calling [Builder.hostnameVerifier] with `hostnameVerifier.orElse(null)`. */
         fun hostnameVerifier(hostnameVerifier: Optional<HostnameVerifier>) =
             hostnameVerifier(hostnameVerifier.getOrNull())
-        
+
         fun baseUrl(baseUrl: String) = apply {
             ensureDefaultBackendBuilder("baseUrl").baseUrl(baseUrl)
         }
@@ -294,7 +294,7 @@ class AnthropicOkHttpClient private constructor() {
             AnthropicClientImpl(
                 clientOptions
                     .httpClient(
-                        OkHttpClient.builder()                      
+                        OkHttpClient.builder()
                             .timeout(clientOptions.timeout())
                             .proxy(proxy)
                             .sslSocketFactory(sslSocketFactory)

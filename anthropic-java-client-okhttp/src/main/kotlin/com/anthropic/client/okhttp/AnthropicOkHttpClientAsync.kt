@@ -140,6 +140,7 @@ class AnthropicOkHttpClientAsync private constructor() {
          * For fine-grained control, pass a [Timeout] object.
          */
         fun timeout(timeout: Duration) = apply { clientOptions.timeout(timeout) }
+
         fun timeout(timeout: Duration) = timeout(Timeout.builder().request(timeout).build())
 
         fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
@@ -249,13 +250,11 @@ class AnthropicOkHttpClientAsync private constructor() {
          *
          * For fine-grained control, pass a [Timeout] object.
          */
-
         fun proxy(proxy: Proxy) = apply { this.proxy = proxy }
 
         /** Alias for calling [Builder.apiKey] with `apiKey.orElse(null)`. */
 
         /** Alias for calling [Builder.authToken] with `authToken.orElse(null)`. */
-
         fun backend(backend: Backend) = apply {
             check(defaultBackendBuilder == null) {
                 "Default backend already set. Cannot set another backend."
