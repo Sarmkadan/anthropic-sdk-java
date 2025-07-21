@@ -218,8 +218,6 @@ class AnthropicOkHttpClient private constructor() {
 
         fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
 
-        fun proxy(proxy: Proxy) = apply { this.proxy = proxy }
-
         fun responseValidation(responseValidation: Boolean) = apply {
             clientOptions.responseValidation(responseValidation)
         }
