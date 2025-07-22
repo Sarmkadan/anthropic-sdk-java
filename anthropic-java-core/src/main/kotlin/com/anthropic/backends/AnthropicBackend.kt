@@ -99,7 +99,7 @@ private constructor(
 
         fun authToken(authToken: Optional<String>) = authToken(authToken.orElse(null))
 
-        fun baseUrl(baseUrl: String) = apply { this.baseUrl = baseUrl }
+        fun baseUrl(baseUrl: String?) = apply { this.baseUrl = baseUrl ?: PRODUCTION_URL }
 
         fun build(): AnthropicBackend {
             return AnthropicBackend(apiKey, authToken, baseUrl)
