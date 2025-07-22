@@ -98,7 +98,6 @@ class AnthropicOkHttpClientAsync private constructor() {
         fun hostnameVerifier(hostnameVerifier: Optional<HostnameVerifier>) =
             hostnameVerifier(hostnameVerifier.getOrNull())
 
-
         /**
          * Whether to throw an exception if any of the Jackson versions detected at runtime are
          * incompatible with the SDK's minimum supported Jackson version (2.13.4).
