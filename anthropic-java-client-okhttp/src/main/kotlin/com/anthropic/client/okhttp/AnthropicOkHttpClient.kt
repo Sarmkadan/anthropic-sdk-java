@@ -120,6 +120,38 @@ class AnthropicOkHttpClient private constructor() {
 
         fun clock(clock: Clock) = apply { clientOptions.clock(clock) }
 
+        fun responseValidation(responseValidation: Boolean) = apply {
+            clientOptions.responseValidation(responseValidation)
+        }
+
+        fun timeout(timeout: Timeout) = apply {
+            clientOptions.timeout(timeout)
+            this.timeout = timeout
+        }
+
+        /**
+         * Sets the maximum time allowed for a complete HTTP call, not including retries.
+         *
+         * See [Timeout.request] for more details.
+         *
+         * For fine-grained control, pass a [Timeout] object.
+         */
+        fun timeout(timeout: Duration) = timeout(Timeout.builder().request(timeout).build())
+
+        fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
+
+        fun apiKey(apiKey: String?) = apply { ensureDefaultBackendBuilder("apiKey").apiKey(apiKey) }
+
+        /** Alias for calling [Builder.apiKey] with `apiKey.orElse(null)`. */
+        fun apiKey(apiKey: Optional<String>) = apiKey(apiKey.getOrNull())
+
+        fun authToken(authToken: String?) = apply {
+            ensureDefaultBackendBuilder("authToken").authToken(authToken)
+        }
+
+        /** Alias for calling [Builder.authToken] with `authToken.orElse(null)`. */
+        fun authToken(authToken: Optional<String>) = authToken(authToken.getOrNull())
+
         fun headers(headers: Headers) = apply { clientOptions.headers(headers) }
 
         fun headers(headers: Map<String, Iterable<String>>) = apply {
@@ -200,39 +232,7 @@ class AnthropicOkHttpClient private constructor() {
             clientOptions.removeAllQueryParams(keys)
         }
 
-        fun timeout(timeout: Timeout) = apply {
-            clientOptions.timeout(timeout)
-            this.timeout = timeout
-        }
-
         fun fromEnv() = apply { ensureDefaultBackendBuilder("fromEnv").fromEnv() }
-
-        /**
-         * Sets the maximum time allowed for a complete HTTP call, not including retries.
-         *
-         * See [Timeout.request] for more details.
-         *
-         * For fine-grained control, pass a [Timeout] object.
-         */
-        fun timeout(timeout: Duration) = timeout(Timeout.builder().request(timeout).build())
-
-        fun maxRetries(maxRetries: Int) = apply { clientOptions.maxRetries(maxRetries) }
-
-        fun responseValidation(responseValidation: Boolean) = apply {
-            clientOptions.responseValidation(responseValidation)
-        }
-
-        fun apiKey(apiKey: String?) = apply { ensureDefaultBackendBuilder("apiKey").apiKey(apiKey) }
-
-        /** Alias for calling [Builder.apiKey] with `apiKey.orElse(null)`. */
-        fun apiKey(apiKey: Optional<String>) = apiKey(apiKey.getOrNull())
-
-        fun authToken(authToken: String?) = apply {
-            ensureDefaultBackendBuilder("authToken").authToken(authToken)
-        }
-
-        /** Alias for calling [Builder.authToken] with `authToken.orElse(null)`. */
-        fun authToken(authToken: Optional<String>) = authToken(authToken.getOrNull())
 
         fun backend(backend: Backend) = apply {
             check(defaultBackendBuilder == null) {
