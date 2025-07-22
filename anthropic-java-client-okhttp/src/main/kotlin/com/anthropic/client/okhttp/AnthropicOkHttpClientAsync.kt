@@ -39,11 +39,11 @@ class AnthropicOkHttpClientAsync private constructor() {
 
         private var clientOptions: ClientOptions.Builder = ClientOptions.builder()
         private var proxy: Proxy? = null
-        private var backend: Backend? = null
-        private var defaultBackendBuilder: AnthropicBackend.Builder? = null
         private var sslSocketFactory: SSLSocketFactory? = null
         private var trustManager: X509TrustManager? = null
         private var hostnameVerifier: HostnameVerifier? = null
+        private var backend: Backend? = null
+        private var defaultBackendBuilder: AnthropicBackend.Builder? = null
 
         fun proxy(proxy: Proxy?) = apply { this.proxy = proxy }
 
@@ -98,12 +98,6 @@ class AnthropicOkHttpClientAsync private constructor() {
         fun hostnameVerifier(hostnameVerifier: Optional<HostnameVerifier>) =
             hostnameVerifier(hostnameVerifier.getOrNull())
 
-        fun baseUrl(baseUrl: String?) = apply {
-            ensureDefaultBackendBuilder("baseUrl").baseUrl(baseUrl)
-        }
-
-        /** Alias for calling [Builder.baseUrl] with `baseUrl.orElse(null)`. */
-        fun baseUrl(baseUrl: Optional<String>) = baseUrl(baseUrl.getOrNull())
 
         /**
          * Whether to throw an exception if any of the Jackson versions detected at runtime are
@@ -123,6 +117,13 @@ class AnthropicOkHttpClientAsync private constructor() {
         }
 
         fun clock(clock: Clock) = apply { clientOptions.clock(clock) }
+
+        fun baseUrl(baseUrl: String?) = apply {
+            ensureDefaultBackendBuilder("baseUrl").baseUrl(baseUrl)
+        }
+
+        /** Alias for calling [Builder.baseUrl] with `baseUrl.orElse(null)`. */
+        fun baseUrl(baseUrl: Optional<String>) = baseUrl(baseUrl.getOrNull())
 
         fun responseValidation(responseValidation: Boolean) = apply {
             clientOptions.responseValidation(responseValidation)
