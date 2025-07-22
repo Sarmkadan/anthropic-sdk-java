@@ -84,11 +84,10 @@ private constructor(
             (System.getProperty("anthropic.baseUrl") ?: System.getenv("ANTHROPIC_BASE_URL"))?.let {
                 baseUrl = it
             }
-            (System.getProperty("anthropic.apiKey") ?: System.getenv(apiKey))?.let {
-                apiKey(it)
+            (System.getProperty("anthropic.apiKey") ?: System.getenv(apiKey))?.let { apiKey(it) }
+            (System.getProperty("anthropic.authToken") ?: System.getenv(authToken))?.let {
+                authToken(it)
             }
-            (System.getProperty("anthropic.authToken") ?: System.getenv(authToken))
-                ?.let { authToken(it) }
         }
 
         fun apiKey(apiKey: String?) = apply { this.apiKey = apiKey }
