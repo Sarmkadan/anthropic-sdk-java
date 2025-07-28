@@ -362,8 +362,8 @@ import com.anthropic.models.beta.AnthropicBeta;
 import java.nio.file.Paths;
 
 FileUploadParams params = FileUploadParams.builder()
-    .file(MultipartField.builder()
-        .value(Paths.get("/path/to/file.pdf"))
+    .file(MultipartField.<java.io.InputStream>builder()
+        .value(Files.newInputStream(Path.of("myfile.txt")))
         .contentType("application/pdf") // content type must be manually specified
         .build())
     .addBeta(AnthropicBeta.FILES_API_2025_04_14)
