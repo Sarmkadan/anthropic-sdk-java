@@ -359,11 +359,12 @@ import com.anthropic.core.MultipartField;
 import com.anthropic.models.beta.files.FileMetadata;
 import com.anthropic.models.beta.files.FileUploadParams;
 import com.anthropic.models.beta.AnthropicBeta;
+import java.io.InputStream;
 import java.nio.file.Paths;
 
 FileUploadParams params = FileUploadParams.builder()
-    .file(MultipartField.builder()
-        .value(Paths.get("/path/to/file.pdf"))
+    .file(MultipartField.<InputStream>builder()
+        .value(Files.newInputStream(Paths.get("/path/to/file.pdf")))
         .contentType("application/pdf") // content type must be manually specified
         .build())
     .addBeta(AnthropicBeta.FILES_API_2025_04_14)
