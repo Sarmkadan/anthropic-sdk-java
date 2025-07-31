@@ -295,11 +295,7 @@ internal class RetryingHttpClientTest {
 
         val response =
             retryingClient.execute(
-                HttpRequest.builder()
-                    .method(HttpMethod.POST)
-                    .baseUrl(baseUrl)
-                    .addPathSegment("something")
-                    .build(),
+                HttpRequest.builder().method(HttpMethod.POST).addPathSegment("something").build(),
                 async,
             )
 
