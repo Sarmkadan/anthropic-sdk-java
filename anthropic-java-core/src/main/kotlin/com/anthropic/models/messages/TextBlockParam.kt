@@ -252,6 +252,17 @@ private constructor(
         fun addCitation(webSearchResultLocation: CitationsWebSearchResultLocation) =
             addCitation(webSearchResultLocation.toParam())
 
+        /**
+         * Alias for calling [addCitation] with
+         * `TextCitationParam.ofSearchResultLocation(searchResultLocation)`.
+         */
+        fun addCitation(searchResultLocation: CitationSearchResultLocationParam) =
+            addCitation(TextCitationParam.ofSearchResultLocation(searchResultLocation))
+
+        /** Alias for calling [addCitation] with `searchResultLocation.toParam()`. */
+        fun addCitation(searchResultLocation: CitationsSearchResultLocation) =
+            addCitation(searchResultLocation.toParam())
+
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.clear()
             putAllAdditionalProperties(additionalProperties)
