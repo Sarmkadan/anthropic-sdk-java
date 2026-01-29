@@ -3,10 +3,10 @@ package com.anthropic.models.beta.messages
 import com.anthropic.core.JsonField
 import com.anthropic.core.JsonSchemaLocalValidation
 import com.anthropic.core.JsonValue
+import com.anthropic.core.betaOutputFormatFromClass
 import com.anthropic.core.checkRequired
 import com.anthropic.core.http.Headers
 import com.anthropic.core.http.QueryParams
-import com.anthropic.core.outputFormatFromClass
 import com.anthropic.models.beta.AnthropicBeta
 import com.anthropic.models.messages.Model
 import java.util.Objects
@@ -251,7 +251,7 @@ internal constructor(
                 )
             }
             this.outputType = outputType
-            val format = outputFormatFromClass(outputType, localValidation)
+            val format = betaOutputFormatFromClass(outputType, localValidation)
             // Use output_config.format instead of deprecated output_format
             paramsBuilder.outputConfig(BetaOutputConfig.builder().format(format).build())
             // Auto-inject beta header
@@ -278,7 +278,7 @@ internal constructor(
                 )
             }
             this.outputType = outputType
-            val format = outputFormatFromClass(outputType, localValidation)
+            val format = betaOutputFormatFromClass(outputType, localValidation)
             val builder = BetaOutputConfig.builder().format(format)
             effort?.let { builder.effort(it) }
             paramsBuilder.outputConfig(builder.build())
