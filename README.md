@@ -40,6 +40,14 @@ MessageCreateParams params = MessageCreateParams.builder()
 Message message = client.messages().create(params);
 ```
 
+## Usage Examples
+
+See the [examples](examples) directory for complete, runnable examples:
+
+- **[BasicUsage.java](examples/BasicUsage.java)** - Minimal setup and first API call
+- **[AdvancedUsage.java](examples/AdvancedUsage.java)** - Custom configuration, streaming, and error handling  
+- **[IntegrationExample.java](examples/IntegrationExample.java)** - Spring dependency injection integration
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
