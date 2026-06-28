@@ -46,6 +46,7 @@ See the [examples](examples) directory for complete, runnable examples:
 
 - **[BasicUsage.java](examples/BasicUsage.java)** - Minimal setup and first API call
 - **[AdvancedUsage.java](examples/AdvancedUsage.java)** - Custom configuration, streaming, and error handling  
+- **[StreamingExample.java](examples/StreamingExample.java)** - Streaming responses for long content
 - **[IntegrationExample.java](examples/IntegrationExample.java)** - Spring dependency injection integration
 
 ## License
