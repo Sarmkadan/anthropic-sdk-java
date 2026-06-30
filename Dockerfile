@@ -7,27 +7,34 @@ FROM eclipse-temurin:21-jdk-jammy AS builder
 
 WORKDIR /workspace
 
-# Install Gradle
+# Install Gradle wrapper dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   unzip \
+  ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-ENV GRADLE_VERSION=8.12
-RUN curl -L https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle.zip \
-  && unzip gradle.zip \
-  && rm gradle.zip
 
-ENV GRADLE_HOME=/workspace/gradle-${GRADLE_VERSION}
-ENV PATH="${GRADLE_HOME}/bin:${PATH}"
+# Copy gradle wrapper files first to leverage docker cache
+COPY gradle/wrapper/gradle-wrapper.jar /workspace/gradle/wrapper/gradle-wrapper.jar
+COPY gradle/wrapper/gradle-wrapper.properties /workspace/gradle/wrapper/gradle-wrapper.properties
+COPY gradlew /workspace/
+COPY gradlew.bat /workspace/
+COPY build.gradle.kts /workspace/
+COPY settings.gradle.kts /workspace/
+COPY gradle.properties /workspace/
 
-# Copy project files and build the example application
+# Make gradlew executable
+RUN chmod +x /workspace/gradlew
+
+# Copy the rest of the project files
 COPY . /workspace
+
+# Build the example application
 RUN ./gradlew :anthropic-java-example:jar --no-daemon
 
 # Runtime stage: create a minimal image with just the JAR and Java
 FROM eclipse-temurin:21-jre-jammy
-
 
 WORKDIR /app
 
