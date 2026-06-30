@@ -1,0 +1,55 @@
+# Docker build context exclusion patterns
+# Build output directories
+build/
+.gradle/
+.gradle-cache/
+
+# IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Version control
+.git/
+.gitignore
+
+# Java build artifacts
+bin/
+obj/
+*.class
+*.jar
+*.war
+*.ear
+*.jmod
+
+# Local development files
+*.iml
+*.ipr
+*.iws
+*.suo
+*.user
+*.userosscache
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Test reports
+build/reports/
+test-results/
+
+# Gradle wrapper local installation
+gradle/
+!gradle-wrapper.jar
+
+# Docker
+.dockerignore
+Dockerfile*
+
+# Operating system files
+.DS_Store
+Thumbs.db

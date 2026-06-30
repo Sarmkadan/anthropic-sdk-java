@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  anthropic-sdk-java:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anthropic-sdk-java
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - JAVA_TOOL_OPTIONS=-Xmx512m
+    volumes:
+      - ./examples:/app/examples:ro
+    ports:
+      - "8080:8080"
+  healthcheck:
+    test: ["CMD", "java", "-version"]
+    interval: 30s
+    timeout: 3s
+    retries: 3
+    start_period: 5s
+    restart: unless-stopped
+
+  # Optional Redis service for caching (if needed by your application)
+  redis:
+    image: redis:7-alpine
+    container_name: anthropic-sdk-java-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  redis_data:
