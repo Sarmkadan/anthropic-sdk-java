@@ -49,6 +49,97 @@ See the [examples](examples) directory for complete, runnable examples:
 - **[StreamingExample.java](examples/StreamingExample.java)** - Streaming responses for long content
 - **[IntegrationExample.java](examples/IntegrationExample.java)** - Spring dependency injection integration
 
+## Docker Support
+
+You can run the Anthropic SDK Java examples in a Docker container. This is useful for testing without installing Java locally.
+
+### Prerequisites
+
+- Docker
+- Docker Compose (optional, for multi-container setups)
+- Anthropic API key (get one from [Anthropic Console](https://console.anthropic.com/))
+
+> **Note:** The Docker image builds using Gradle. If you encounter build issues, ensure you have a working Gradle installation or build the JAR locally first with `./gradlew :anthropic-java-example:jar`.
+
+### Quick Start
+
+1. **Build the Docker image:**
+
+```bash
+# Set your API key as an environment variable
+# On Linux/macOS:
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# On Windows (PowerShell):
+# $env:ANTHROPIC_API_KEY="your-api-key-here"
+
+# Build the image
+docker compose build
+```
+
+2. **Run the example:**
+
+```bash
+# Run the basic usage example
+docker compose run --rm anthropic-sdk-java
+
+# Or start the service in the background
+docker compose up -d anthropic-sdk-java
+
+# View logs
+docker compose logs -f anthropic-sdk-java
+```
+
+3. **Run specific examples:**
+
+```bash
+# Run AdvancedUsage example
+docker compose run --rm anthropic-sdk-java -Pexample=AdvancedUsage
+
+# Run StreamingExample
+# docker compose run --rm anthropic-sdk-java -Pexample=StreamingExample
+
+# Run MessagesExample
+# docker compose run --rm anthropic-sdk-java -Pexample=MessagesExample
+```
+
+### Using with docker-compose.yml
+
+The provided `docker-compose.yml` includes:
+
+- **anthropic-sdk-java**: Main service running the SDK examples
+- **redis**: Optional Redis service for caching (if your application uses Redis)
+
+You can customize the environment and ports in the `docker-compose.yml` file.
+
+### Building a Custom Image
+
+To create a Docker image with your own application:
+
+```dockerfile
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY build/libs/your-application.jar /app/app.jar
+
+CMD ["java", "-jar", "/app/app.jar"]
+```
+
+### Environment Variables
+
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `ANTHROPIC_API_KEY` | Your Anthropic API key | Yes |
+| `JAVA_TOOL_OPTIONS` | JVM options | Optional |
+
+
+### Health Check
+
+The Docker image includes a health check that verifies Java is installed and executable.
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
