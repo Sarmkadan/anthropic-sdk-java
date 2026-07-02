@@ -35,13 +35,19 @@ class ModelServiceImpl internal constructor(private val clientOptions: ClientOpt
     override fun withOptions(modifier: Consumer<ClientOptions.Builder>): ModelService =
         ModelServiceImpl(clientOptions.toBuilder().apply(modifier::accept).build())
 
-    override fun retrieve(params: ModelRetrieveParams, requestOptions: RequestOptions): ModelInfo =
+    override fun retrieve(params: ModelRetrieveParams, requestOptions: RequestOptions): ModelInfo {
+        if (params == null) throw com.anthropic.exceptions.ArgumentNullException("params must not be null")
+        if (requestOptions == null) throw com.anthropic.exceptions.ArgumentNullException("requestOptions must not be null")
         // get /v1/models/{model_id}
-        withRawResponse().retrieve(params, requestOptions).parse()
+        return withRawResponse().retrieve(params, requestOptions).parse()
+    }
 
-    override fun list(params: ModelListParams, requestOptions: RequestOptions): ModelListPage =
+    override fun list(params: ModelListParams, requestOptions: RequestOptions): ModelListPage {
+        if (params == null) throw com.anthropic.exceptions.ArgumentNullException("params must not be null")
+        if (requestOptions == null) throw com.anthropic.exceptions.ArgumentNullException("requestOptions must not be null")
         // get /v1/models
-        withRawResponse().list(params, requestOptions).parse()
+        return withRawResponse().list(params, requestOptions).parse()
+    }
 
     class WithRawResponseImpl internal constructor(private val clientOptions: ClientOptions) :
         ModelService.WithRawResponse {
@@ -74,7 +80,11 @@ class ModelServiceImpl internal constructor(private val clientOptions: ClientOpt
                     .build()
                     .prepare(clientOptions, params)
             val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
-            val response = clientOptions.httpClient.execute(request, requestOptions)
+            val response = try {
+                clientOptions.httpClient.execute(request, requestOptions)
+            } catch (e: java.io.IOException) {
+                throw com.anthropic.exceptions.AnthropicSdkJavaException("Error executing request", e)
+            }
             return errorHandler.handle(response).parseable {
                 response
                     .use { retrieveHandler.handle(it) }
@@ -101,7 +111,11 @@ class ModelServiceImpl internal constructor(private val clientOptions: ClientOpt
                     .build()
                     .prepare(clientOptions, params)
             val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
-            val response = clientOptions.httpClient.execute(request, requestOptions)
+            val response = try {
+                clientOptions.httpClient.execute(request, requestOptions)
+            } catch (e: java.io.IOException) {
+                throw com.anthropic.exceptions.AnthropicSdkJavaException("Error executing request", e)
+            }
             return errorHandler.handle(response).parseable {
                 response
                     .use { listHandler.handle(it) }
