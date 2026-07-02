@@ -43,23 +43,32 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
 
     override fun batches(): BatchService = batches
 
-    override fun create(params: MessageCreateParams, requestOptions: RequestOptions): BetaMessage =
+    override fun create(params: MessageCreateParams, requestOptions: RequestOptions): BetaMessage {
+        if (params == null) throw com.anthropic.exceptions.ArgumentNullException("params must not be null")
+        if (requestOptions == null) throw com.anthropic.exceptions.ArgumentNullException("requestOptions must not be null")
         // post /v1/messages?beta=true
-        withRawResponse().create(params, requestOptions).parse()
+        return withRawResponse().create(params, requestOptions).parse()
+    }
 
     override fun createStreaming(
         params: MessageCreateParams,
         requestOptions: RequestOptions,
-    ): StreamResponse<BetaRawMessageStreamEvent> =
+    ): StreamResponse<BetaRawMessageStreamEvent> {
+        if (params == null) throw com.anthropic.exceptions.ArgumentNullException("params must not be null")
+        if (requestOptions == null) throw com.anthropic.exceptions.ArgumentNullException("requestOptions must not be null")
         // post /v1/messages?beta=true
-        withRawResponse().createStreaming(params, requestOptions).parse()
+        return withRawResponse().createStreaming(params, requestOptions).parse()
+    }
 
     override fun countTokens(
         params: MessageCountTokensParams,
         requestOptions: RequestOptions,
-    ): BetaMessageTokensCount =
+    ): BetaMessageTokensCount {
+        if (params == null) throw com.anthropic.exceptions.ArgumentNullException("params must not be null")
+        if (requestOptions == null) throw com.anthropic.exceptions.ArgumentNullException("requestOptions must not be null")
         // post /v1/messages/count_tokens?beta=true
-        withRawResponse().countTokens(params, requestOptions).parse()
+        return withRawResponse().countTokens(params, requestOptions).parse()
+    }
 
     override fun toolRunner(
         params: ToolRunnerCreateParams,
@@ -111,7 +120,11 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
                         isStreaming = false,
                         model = params.model().toString(),
                     )
-            val response = clientOptions.httpClient.execute(request, requestOptions)
+            val response = try {
+                clientOptions.httpClient.execute(request, requestOptions)
+            } catch (e: java.io.IOException) {
+                throw com.anthropic.exceptions.AnthropicSdkJavaException("Error executing request", e)
+            }
             return errorHandler.handle(response).parseable {
                 response
                     .use { createHandler.handle(it) }
@@ -159,7 +172,11 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
                         isStreaming = true,
                         model = params.model().toString(),
                     )
-            val response = clientOptions.httpClient.execute(request, requestOptions)
+            val response = try {
+                clientOptions.httpClient.execute(request, requestOptions)
+            } catch (e: java.io.IOException) {
+                throw com.anthropic.exceptions.AnthropicSdkJavaException("Error executing request", e)
+            }
             return errorHandler.handle(response).parseable {
                 response
                     .let { createStreamingHandler.handle(it) }
@@ -192,7 +209,11 @@ class MessageServiceImpl internal constructor(private val clientOptions: ClientO
                     .build()
                     .prepare(clientOptions, params)
             val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
-            val response = clientOptions.httpClient.execute(request, requestOptions)
+            val response = try {
+                clientOptions.httpClient.execute(request, requestOptions)
+            } catch (e: java.io.IOException) {
+                throw com.anthropic.exceptions.AnthropicSdkJavaException("Error executing request", e)
+            }
             return errorHandler.handle(response).parseable {
                 response
                     .use { countTokensHandler.handle(it) }
