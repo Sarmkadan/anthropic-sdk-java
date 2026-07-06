@@ -143,3 +143,9 @@ The Docker image includes a health check that verifies Java is installed and exe
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Configuration
+
+The following configuration options are available:
+
+* `anthropic.apiKey`: Your API key
+* `anthropic.debug`: Enable debug mode (default: false)
