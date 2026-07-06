@@ -6,3 +6,6 @@
 build/
 codegen.log
 kls_database.db
+
+# aider internal state - never commit
+.aider*
